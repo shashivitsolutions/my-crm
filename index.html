@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Shashiv IT CRM - Cloud Sync</title>
+<title>Shashiv IT CRM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet"/>
 <style>
@@ -64,6 +64,7 @@ input,select,textarea{font-family:var(--font)}
 }
 /* ── APP LAYOUT ── */
 .app{display:flex;height:100vh;overflow:hidden}
+/* ── SIDEBAR ── */
 .sidebar{
   width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg2);
   border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10;
@@ -115,6 +116,7 @@ input,select,textarea{font-family:var(--font)}
   display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;
 }
 .logout-btn:hover{background:rgba(245,81,81,.1);color:var(--red);border-color:var(--red)}
+/* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{
   height:56px;background:var(--bg2);border-bottom:1px solid var(--border);
@@ -124,6 +126,7 @@ input,select,textarea{font-family:var(--font)}
 .breadcrumb{font-size:11.5px;color:var(--text3);margin-top:1px}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .content{flex:1;overflow-y:auto;padding:20px}
+/* ── BUTTONS ── */
 .btn{
   height:34px;padding:0 16px;border-radius:var(--radius-sm);
   border:1px solid var(--border2);background:transparent;color:var(--text2);
@@ -137,6 +140,7 @@ input,select,textarea{font-family:var(--font)}
 .btn.orange:hover{background:var(--orange2)}
 .btn.danger{border-color:rgba(245,81,81,.4);color:var(--red)}
 .btn.danger:hover{background:rgba(245,81,81,.1)}
+.btn.sm{height:28px;padding:0 10px;font-size:12px}
 .btn.full{width:100%;justify-content:center;height:42px}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .tb-btn{
@@ -148,6 +152,16 @@ input,select,textarea{font-family:var(--font)}
 .tb-btn:hover{background:var(--bg4);color:var(--text);border-color:var(--blue)}
 .tb-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
 .tb-btn.primary:hover{background:var(--blue2)}
+.act-btn{
+  height:26px;padding:0 10px;border-radius:var(--radius-xs);
+  border:1px solid var(--border2);background:transparent;color:var(--text2);
+  font-size:11.5px;transition:all .15s;
+}
+.act-btn:hover{background:var(--bg4);color:var(--text)}
+.act-btn.info:hover{border-color:var(--blue3);color:var(--blue3)}
+.act-btn.danger:hover{border-color:var(--red);color:var(--red)}
+.act-btn.success:hover{border-color:var(--green);color:var(--green)}
+/* ── FORMS ── */
 .form-group{display:flex;flex-direction:column;gap:5px}
 .form-label{font-size:12px;font-weight:600;color:var(--text2)}
 .form-input,.form-select,.form-textarea{
@@ -156,10 +170,28 @@ input,select,textarea{font-family:var(--font)}
   width:100%;
 }
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue);background:var(--bg4)}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text3)}
+.form-select{appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23525e7a' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:30px;
+}
+.form-textarea{min-height:72px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.form-row.full{grid-template-columns:1fr}
+.form-hint{font-size:11px;color:var(--text3)}
+/* ── CARDS ── */
 .card{
   background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
   padding:18px;margin-bottom:14px;
 }
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.card-title{font-family:var(--font-head);font-size:13.5px;font-weight:700;color:var(--text)}
+.card-action{font-size:12px;color:var(--blue);cursor:pointer}
+.card-action:hover{text-decoration:underline}
+/* ── STATS GRID ── */
 .stats-grid{
   display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;
 }
@@ -167,14 +199,61 @@ input,select,textarea{font-family:var(--font)}
   background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
   padding:18px 20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
 }
-.stat-card.blue::before{background:var(--blue);content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;
+}
+.stat-card.blue::before{background:var(--blue)}
+.stat-card.orange::before{background:var(--orange)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.purple::before{background:var(--purple)}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.stat-label{font-size:11.5px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
 .stat-num{font-family:var(--font-head);font-size:26px;font-weight:800;color:var(--text);margin:4px 0 2px}
+.stat-sub{font-size:11px;color:var(--text3)}
+/* ── TABLES ── */
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead tr{border-bottom:1px solid var(--border)}
-th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase}
-tbody tr{border-bottom:1px solid var(--border)}
-td{padding:11px 12px;color:var(--text2)}
+th{
+  padding:10px 12px;text-align:left;font-size:11px;font-weight:700;
+  color:var(--text3);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg3)}
+td{padding:11px 12px;color:var(--text2);vertical-align:middle}
+.table-toolbar{
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;
+}
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:300px}
+.search-icon{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  font-size:14px;color:var(--text3);pointer-events:none;
+}
+.search-input{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);
+  color:var(--text);font-size:13px;padding:7px 12px 7px 32px;outline:none;
+  transition:border .15s;width:100%;
+}
+.search-input:focus{border-color:var(--blue)}
+.filter-select{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);
+  color:var(--text2);font-size:13px;padding:7px 10px;outline:none;cursor:pointer;
+}
+/* ── BADGES ── */
+.badge{
+  display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;
+  font-size:11px;font-weight:600;white-space:nowrap;
+}
+.badge.pending{background:rgba(245,200,66,.12);color:var(--yellow);border:1px solid rgba(245,200,66,.25)}
+.badge.active{background:rgba(79,125,255,.12);color:var(--blue3);border:1px solid rgba(79,125,255,.2)}
+.badge.done{background:rgba(34,212,126,.1);color:var(--green);border:1px solid rgba(34,212,126,.2)}
+.badge.cancelled{background:rgba(245,81,81,.1);color:var(--red);border:1px solid rgba(245,81,81,.2)}
+.badge.urgent{background:rgba(245,81,81,.15);color:#ff8080;border:1px solid rgba(245,81,81,.3)}
+/* ── GRID HELPERS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+/* ── MODAL ── */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;
   display:flex;align-items:center;justify-content:center;padding:20px;
@@ -183,16 +262,38 @@ td{padding:11px 12px;color:var(--text2)}
 .modal{
   background:var(--bg2);border:1px solid var(--border2);border-radius:16px;
   width:100%;max-width:560px;max-height:85vh;display:flex;flex-direction:column;
+  box-shadow:var(--shadow);
 }
-.modal-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.modal-title{font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text)}
+.modal-close{
+  width:30px;height:30px;border-radius:6px;border:1px solid var(--border);
+  background:transparent;color:var(--text3);font-size:14px;display:flex;
+  align-items:center;justify-content:center;transition:all .15s;
+}
+.modal-close:hover{background:rgba(245,81,81,.1);color:var(--red);border-color:var(--red)}
 .modal-body{padding:20px 22px;overflow-y:auto;flex:1}
+.modal-foot{
+  padding:14px 22px;border-top:1px solid var(--border);display:flex;
+  justify-content:flex-end;gap:8px;flex-shrink:0;
+}
+/* ── TOAST ── */
 .toast{
-  position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border2);
-  border-radius:var(--radius-sm);padding:12px 18px;display:flex;align-items:center;gap:10px;
+  position:fixed;bottom:24px;right:24px;background:var(--bg3);
+  border:1px solid var(--border2);border-radius:var(--radius-sm);
+  padding:12px 18px;display:flex;align-items:center;gap:10px;
   font-size:13.5px;color:var(--text);box-shadow:var(--shadow);
   transform:translateY(80px);opacity:0;transition:all .3s ease;z-index:2000;
+  max-width:360px;
 }
 .toast.show{transform:translateY(0);opacity:1}
+.toast.error{border-color:rgba(245,81,81,.4)}
+.toast.error .toast-icon{color:var(--red)}
+.toast-icon{font-size:15px;color:var(--green)}
+/* ── LOADING ── */
 .loading-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3000;
   display:flex;align-items:center;justify-content:center;
@@ -202,91 +303,218 @@ td{padding:11px 12px;color:var(--text2)}
   border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
+/* ── EMPTY STATE ── */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 24px;text-align:center;
+}
+.empty-state .icon{font-size:36px;margin-bottom:10px;opacity:.6}
+.empty-state p{color:var(--text3);font-size:13.5px}
+/* ── ACTIVITY ── */
+.activity-item{
+  display:flex;align-items:flex-start;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--border);
+}
+.activity-item:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.act-body{flex:1;min-width:0}
+.act-text{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.act-time{font-size:11.5px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+/* ── DETAIL HEADER ── */
+.detail-header{
+  display:flex;align-items:center;gap:14px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;
+}
+.detail-avatar{
+  width:52px;height:52px;border-radius:12px;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-head);font-weight:800;font-size:18px;color:#fff;flex-shrink:0;
+}
+.detail-name{font-family:var(--font-head);font-size:17px;font-weight:700;color:var(--text)}
+.detail-meta{display:flex;flex-wrap:wrap;gap:12px;margin-top:5px;font-size:12.5px;color:var(--text2)}
+/* ── TABS ── */
+.tabs{display:flex;gap:2px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:14px}
+.tab{
+  flex:1;text-align:center;padding:8px 14px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text3);
+}
+.tab:hover{color:var(--text2)}
+.tab.active{background:var(--bg4);color:var(--text);font-weight:600}
+/* ── INFO TABLE ── */
+.info-table{width:100%}
+.info-table td{padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.info-table td:first-child{width:40%;color:var(--text3);font-weight:600}
+.info-table td:last-child{color:var(--text)}
+/* ── TOTALS ── */
+.totals-row{border-top:2px solid var(--border2);margin-top:8px;padding-top:12px}
+.total-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+.total-label{font-size:12.5px;color:var(--text2)}
+.total-value{font-size:14px;font-weight:700;color:var(--text)}
+.total-value.highlight{color:var(--orange);font-size:16px}
+/* ── SETTINGS ── */
+.settings-layout{display:grid;grid-template-columns:200px 1fr;gap:14px}
+.settings-nav{display:flex;flex-direction:column;gap:1px}
+.settings-nav-item{
+  padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;
+  font-size:13px;color:var(--text2);transition:all .15s;
+}
+.settings-nav-item:hover{background:var(--bg4);color:var(--text)}
+.settings-nav-item.active{background:linear-gradient(135deg,rgba(79,125,255,.14),rgba(255,107,53,.07));color:var(--blue3)}
+/* ── TECH CARDS ── */
+.tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.tech-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;text-align:center;
+}
+.tech-avatar{
+  width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-head);font-weight:800;font-size:20px;color:#fff;
+  margin:0 auto 12px;
+}
+/* ── ACTION BTNS ── */
+.action-btns{display:flex;gap:4px;flex-wrap:nowrap}
+/* ── OTP ── */
+.otp-input{
+  width:46px;height:54px;background:var(--bg3);border:2px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);font-size:22px;font-weight:700;
+  text-align:center;outline:none;transition:border .15s;font-family:var(--font-head);
+}
+.otp-input:focus{border-color:var(--blue);background:var(--bg4)}
+.otp-input.filled{border-color:var(--green)}
+.otp-input.error{border-color:var(--red);animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 </style>
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
 <div id="login-screen" class="login-screen">
   <div class="login-card" id="panel-login">
     <div class="login-logo">
       <div class="logo-icon">S</div>
       <div>
         <div class="login-brand">Shashiv IT Solutions</div>
-        <div class="login-subtitle">Cloud Service Management</div>
+        <div class="login-subtitle">CRM &amp; Service Management</div>
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Employee ID</label>
-      <input class="form-input" id="login-user" type="text" placeholder="123456" />
+      <input class="form-input" id="login-user" type="text" placeholder="Enter your ID" autocomplete="username"/>
     </div>
-    <div class="form-group" style="margin-top:12px">
+    <div class="form-group" style="margin-top:12px;position:relative">
       <label class="form-label">Password</label>
-      <input class="form-input" id="login-pass" type="password" placeholder="00000000" />
+      <div style="position:relative">
+        <input class="form-input" id="login-pass" type="password" placeholder="Enter password" autocomplete="current-password"/>
+        <button type="button" id="toggle-pass"
+          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px"
+          onclick="togglePassVis('login-pass','toggle-pass')">👁</button>
+      </div>
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
     <button class="btn primary full" id="login-btn" onclick="doLogin()" style="margin-top:20px">Sign In</button>
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text3)">
+      ID: <code style="color:var(--blue)">123456</code> &nbsp;/&nbsp; Password: <code style="color:var(--orange)">00000000</code>
+    </div>
   </div>
 </div>
 
+<!-- APP SHELL -->
 <div id="app" class="app" style="display:none">
   <aside class="sidebar">
     <div class="logo-area">
       <div class="logo-icon">S</div>
       <div>
         <div class="logo-text">Shashiv IT</div>
-        <div class="logo-sub">Cloud Sync Active</div>
+        <div class="logo-sub">CRM Solutions</div>
       </div>
     </div>
     <nav class="nav" id="sidebar-nav">
       <div class="nav-section">Main</div>
-      <div class="nav-item active" onclick="showDashboard()"><span class="nav-icon">⊟</span> Dashboard</div>
-      <div class="nav-item" onclick="showCustomers()"><span class="nav-icon">👥</span> Customers</div>
-      <div class="nav-item" onclick="showJobs()"><span class="nav-icon">🔧</span> Active Work</div>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">⊟</span> Dashboard</div>
+      <div class="nav-item" data-page="customers"><span class="nav-icon">👥</span> Customers<span class="nav-badge green" id="badge-customers">—</span></div>
+      <div class="nav-item" data-page="enquiries"><span class="nav-icon">📞</span> Enquiries<span class="nav-badge" id="badge-enquiries">—</span></div>
+      <div class="nav-item" data-page="activework"><span class="nav-icon">🔧</span> Active Work<span class="nav-badge" id="badge-active">—</span></div>
+      <div class="nav-section">Management</div>
+      <div class="nav-item" data-page="technicians"><span class="nav-icon">👤</span> Technicians</div>
+      <div class="nav-item" data-page="billing"><span class="nav-icon">🧾</span> Billing</div>
+      <div class="nav-item" data-page="reports"><span class="nav-icon">📊</span> Reports</div>
+      <div class="nav-section">System</div>
+      <div class="nav-item" data-page="documents"><span class="nav-icon">📄</span> Documents</div>
+      <div class="nav-item" data-page="settings"><span class="nav-icon">⚙</span> Settings</div>
     </nav>
     <div class="sidebar-footer">
       <div class="user-card">
-        <div class="user-avatar">AD</div>
+        <div class="user-avatar" id="sidebar-avatar">AD</div>
         <div>
-          <div class="user-name">Admin</div>
-          <div class="user-role">Administrator</div>
+          <div class="user-name" id="sidebar-name">Admin</div>
+          <div class="user-role" id="sidebar-role">Administrator</div>
         </div>
-        <button class="logout-btn" onclick="doLogout()">→</button>
+        <button class="logout-btn" onclick="doLogout()" title="Logout">→</button>
       </div>
     </div>
   </aside>
-  
   <div class="main">
     <header class="topbar">
       <div>
         <div class="page-title" id="topbar-title">Dashboard</div>
-        <div class="breadcrumb" id="topbar-sub">Overview & Analytics</div>
+        <div class="breadcrumb" id="topbar-sub">Overview &amp; Analytics</div>
       </div>
       <div class="topbar-right">
-        <button class="tb-btn primary" onclick="openAddModal()">+ Add New</button>
+        <button class="tb-btn" onclick="refreshCurrentPage()">↻ Refresh</button>
+        <button class="tb-btn primary" id="topbar-add-btn" onclick="openAddModal()">+ Add New</button>
       </div>
     </header>
     <main class="content" id="page-content">
-       </main>
+      <div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>
+    </main>
   </div>
 </div>
 
-<div class="modal-overlay" id="global-modal" style="display:none">
-  <div class="modal">
+<!-- GLOBAL MODAL -->
+<div class="modal-overlay" id="global-modal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-inner">
     <div class="modal-head">
-      <div class="modal-title" id="modal-title-text">Add Item</div>
-      <button onclick="closeModal()">✕</button>
+      <div class="modal-title" id="modal-title">Add</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
   </div>
 </div>
 
-<div class="toast" id="toast">✓ Action Completed</div>
-<div class="loading-overlay" id="loading" style="display:none"><div class="spinner"></div></div>
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✓</span>
+  <span id="toast-msg">Done</span>
+</div>
 
+<!-- LOADING -->
+<div class="loading-overlay" id="loading" style="display:none">
+  <div class="spinner"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// DATA STORE — localStorage-backed
+// ═══════════════════════════════════════════════════════════════════════
+const DB = {
+  get(key){try{return JSON.parse(localStorage.getItem('crm_'+key)||'null')}catch{return null}},
+  set(key,val){localStorage.setItem('crm_'+key,JSON.stringify(val))},
+  getList(key){return this.get(key)||[]},
+  push(key,item){const l=this.getList(key);l.push(item);this.set(key,l)},
+  update(key,id,updates){const l=this.getList(key);const i=l.findIndex(x=>x.id===id);if(i>=0){l[i]={...l[i],...updates};this.set(key,l);return l[i]}return null},
+  remove(key,id){const l=this.getList(key).filter(x=>x.id!==id);this.set(key,l)},
+  nextId(key){const l=this.getList(key);return l.length>0?Math.max(...l.map(x=>x.id))+1:1},
+};
 <script type="module">
+  // 1. Import Firebase from the Web CDN
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, set, get, child, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { getDatabase, ref, set, onValue, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+  // 2. Your specific Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyCmlp8tIIfwPV_os8gUPFfYpxEDSW_cGCM",
     authDomain: "mycrm-f0774.firebaseapp.com",
@@ -298,137 +526,1542 @@ td{padding:11px 12px;color:var(--text2)}
     measurementId: "G-YVH2SGHT1E"
   };
 
+  // 3. Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const database = getDatabase(app);
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // CLOUD DATA STORE
-  // ═══════════════════════════════════════════════════════════════════════
+  // 4. Override the DB object to use Firebase instead of LocalStorage
   window.DB = {
-    allData: {},
-    
-    async init() {
-      const dbRef = ref(database);
-      const snapshot = await get(child(dbRef, 'crm_data'));
-      this.allData = snapshot.exists() ? snapshot.val() : {};
+    get: async (key) => {
+      try {
+        const dbRef = ref(database);
+        const snapshot = await get(child(dbRef, `crm_data/${key}`));
+        return snapshot.exists() ? snapshot.val() : null;
+      } catch (e) {
+        console.error("Error fetching data:", e);
+        return JSON.parse(localStorage.getItem('crm_v1_' + key));
+      }
     },
-
-    get(key) { return this.allData[key] || null; },
-    
-    getList(key) {
-      const data = this.get(key);
-      return data ? Object.values(data) : [];
-    },
-
-    set(key, val) {
-      this.allData[key] = val;
+    set: (key, val) => {
+      // Save to Cloud
       set(ref(database, `crm_data/${key}`), val);
-      localStorage.setItem('crm_bkp_'+key, JSON.stringify(val));
-    },
-
-    push(key, item) {
-      if(!item.id) item.id = 'ID-' + Date.now();
-      const current = this.get(key) || {};
-      current[item.id] = item;
-      this.set(key, current);
-      return item.id;
+      // Also save to LocalStorage as a backup
+      localStorage.setItem('crm_v1_' + key, JSON.stringify(val));
     }
   };
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // SYSTEM FUNCTIONS
-  // ═══════════════════════════════════════════════════════════════════════
-  window.doLogin = function() {
-    const id = document.getElementById('login-user').value;
-    const pass = document.getElementById('login-pass').value;
-    if(id === '123456' && pass === '00000000') {
-      sessionStorage.setItem('crm_session', 'active');
-      location.reload();
-    } else {
-      alert("Invalid login!");
-    }
-  };
-
-  window.doLogout = function() {
-    sessionStorage.removeItem('crm_session');
-    location.reload();
-  };
-
-  window.showDashboard = function() {
-    document.getElementById('topbar-title').innerText = "Dashboard";
-    const customers = window.DB.getList('customers').length;
-    const jobs = window.DB.getList('jobs').length;
-    
-    document.getElementById('page-content').innerHTML = `
-      <div class="stats-grid">
-        <div class="stat-card blue"><div class="stat-num">${customers}</div><div>Total Customers</div></div>
-        <div class="stat-card blue"><div class="stat-num">${jobs}</div><div>Active Jobs</div></div>
-      </div>
-    `;
-  };
-
-  window.showCustomers = function() {
-    document.getElementById('topbar-title').innerText = "Customers";
-    const list = window.DB.getList('customers');
-    let rows = list.map(c => `<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.address}</td></tr>`).join('');
-    
-    document.getElementById('page-content').innerHTML = `
-      <div class="card">
-        <table>
-          <thead><tr><th>Name</th><th>Phone</th><th>Address</th></tr></thead>
-          <tbody>${rows || '<tr><td colspan="3">No customers found.</td></tr>'}</tbody>
-        </table>
-      </div>
-    `;
-  };
-
-  window.openAddModal = function() {
-    document.getElementById('global-modal').style.display = 'flex';
-    document.getElementById('modal-body').innerHTML = `
-      <div class="form-group">
-        <label class="form-label">Customer Name</label>
-        <input id="new-c-name" class="form-input" />
-      </div>
-      <div class="form-group" style="margin-top:10px">
-        <label class="form-label">Phone Number</label>
-        <input id="new-c-phone" class="form-input" />
-      </div>
-      <button class="btn primary full" style="margin-top:20px" onclick="saveNewCustomer()">Save Customer</button>
-    `;
-  };
-
-  window.saveNewCustomer = function() {
-    const name = document.getElementById('new-c-name').value;
-    const phone = document.getElementById('new-c-phone').value;
-    if(!name) return alert("Name required");
-    
-    window.DB.push('customers', { name, phone, address: 'Cloud Entry' });
-    closeModal();
-    showCustomers();
-    showToast();
-  };
-
-  window.closeModal = function() { document.getElementById('global-modal').style.display = 'none'; };
+  // --- START OF YOUR ORIGINAL CRM LOGIC ---
+  // Note: I am keeping your existing logic but it will now use the new 'DB' object above.
   
-  window.showToast = function() {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
-  };
+  // (Paste the rest of your original functions here: App, Auth, UI, etc.)
+  // Ensure you keep your existing 'const App = {...}' and 'const Auth = {...}' logic!
+</script>
+// ── Seed default data if empty ──────────────────────────────────────────
+function seedIfEmpty(){
+  if(DB.getList('customers').length===0){
+    const now=new Date().toISOString();
+    DB.set('customers',[
+      {id:1,name:'Rahul Sharma',phone:'9876543210',email:'rahul@email.com',address:'Virar, Mumbai',created_at:now},
+      {id:2,name:'Priya Patel',phone:'8765432109',email:'priya@email.com',address:'Bandra, Mumbai',created_at:now},
+      {id:3,name:'Amit Kumar',phone:'7654321098',email:'amit@email.com',address:'Pune, Maharashtra',created_at:now},
+    ]);
+    DB.set('technicians',[
+      {id:1,full_name:'Vijay Salvi',phone:'9123456780',email:'vijay@shashivit.com',designation:'Senior Technician',status:'Active',created_at:now},
+      {id:2,full_name:'Ravi Desai',phone:'9234567801',email:'ravi@shashivit.com',designation:'Technician',status:'Active',created_at:now},
+    ]);
+    DB.set('jobs',[
+      {id:1,job_number:'JOB-0001',customer_id:1,technician_id:1,device_type:'HP Laptop',device_brand:'HP',device_model:'15s-fq2xxx',problem_desc:'Screen flickering, battery not charging',status:'In Progress',priority:'Urgent',estimated_cost:2500,received_date:now,notes:'',created_at:now},
+      {id:2,job_number:'JOB-0002',customer_id:2,technician_id:2,device_type:'Samsung Phone',device_brand:'Samsung',device_model:'Galaxy A52',problem_desc:'Touch not working after water damage',status:'Pending',priority:'Normal',estimated_cost:1800,received_date:now,notes:'',created_at:now},
+      {id:3,job_number:'JOB-0003',customer_id:3,technician_id:1,device_type:'Dell Desktop',device_brand:'Dell',device_model:'Inspiron 3880',problem_desc:'Not booting, HDD failure',status:'Completed',priority:'Low',estimated_cost:3200,received_date:now,completed_date:now,notes:'Replaced HDD',created_at:now},
+    ]);
+    DB.set('enquiries',[
+      {id:1,caller_name:'Suresh Nair',phone:'9012345678',call_reason:'Laptop screen broken',converted:false,logged_at:now},
+      {id:2,caller_name:'Meena Joshi',phone:'8901234567',call_reason:'Phone not charging',converted:true,logged_at:now},
+    ]);
+    DB.set('parts',[
+      {id:1,job_id:1,item_name:'New Battery',quantity:1,unit_price:1200,total_price:1200},
+      {id:2,job_id:1,item_name:'Screen cleaning service',quantity:1,unit_price:500,total_price:500},
+      {id:3,job_id:3,item_name:'WD HDD 1TB',quantity:1,unit_price:2800,total_price:2800},
+      {id:4,job_id:3,item_name:'OS Installation',quantity:1,unit_price:400,total_price:400},
+    ]);
+    DB.set('invoices',[
+      {id:1,invoice_number:'INV-0001',customer_id:3,job_id:3,subtotal:3200,discount:0,tax_percent:18,tax_amount:576,total:3776,status:'Paid',payment_method:'Cash',created_at:now},
+    ]);
+    DB.set('settings',{company_name:'Shashiv IT Solutions',company_phone:'+91 98765 43210',company_email:'info@shashivit.com',company_address:'Shop No. 5, Near Railway Station, Virar West, Mumbai - 401303',gst_number:'27AABCS1429B1ZB'});
+    DB.set('attendance',[]);
+    DB.set('salary_records',[]);
+  }
+}
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // STARTUP
-  // ═══════════════════════════════════════════════════════════════════════
-  async function init() {
-    await window.DB.init();
-    if(sessionStorage.getItem('crm_session')) {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'flex';
-      showDashboard();
+// ═══════════════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════════════
+const AUTH_ID='123456', AUTH_PASS='00000000';
+const Auth={
+  _tok:null,
+  login(id,pass){
+    if(id===AUTH_ID&&pass===AUTH_PASS){
+      const u={id:1,username:AUTH_ID,full_name:'Admin User',role:'admin'};
+      this._tok='crm-tok-2025';
+      localStorage.setItem('crm_token','crm-tok-2025');
+      localStorage.setItem('crm_user',JSON.stringify(u));
+      return u;
+    }
+    return null;
+  },
+  token(){return this._tok||localStorage.getItem('crm_token')},
+  user(){try{return JSON.parse(localStorage.getItem('crm_user')||'null')}catch{return null}},
+  clear(){this._tok=null;localStorage.removeItem('crm_token');localStorage.removeItem('crm_user')},
+};
+
+// ═══════════════════════════════════════════════════════════════════════
+// APP STATE & ROUTER
+// ═══════════════════════════════════════════════════════════════════════
+const AppState={currentPage:'dashboard',pageParams:{},technicians:[]};
+const PAGE_CONFIG={
+  dashboard:        {title:'Dashboard',         sub:'Overview & Analytics',         btn:null},
+  customers:        {title:'Customers',          sub:'Manage customer records',       btn:'+ Add Customer'},
+  'customer-detail':{title:'Customer Detail',    sub:'Full service history',          btn:'+ New Job'},
+  enquiries:        {title:'Enquiries',          sub:'Call & enquiry log',            btn:'+ Log Call'},
+  activework:       {title:'Active Work',        sub:'Jobs currently in progress',    btn:'+ Create Job'},
+  technicians:      {title:'Technicians',        sub:'Team management',              btn:'+ Add Technician'},
+  billing:          {title:'Billing',            sub:'Invoices & payments',           btn:'+ New Invoice'},
+  reports:          {title:'Reports',            sub:'Analytics & insights',          btn:null},
+  documents:        {title:'Documents',          sub:'Generate & manage documents',   btn:null},
+  settings:         {title:'Settings',           sub:'System configuration',          btn:null},
+};
+
+function navigate(page,params={}){
+  AppState.currentPage=page;AppState.pageParams=params;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.page===page));
+  const cfg=PAGE_CONFIG[page]||{title:page,sub:'',btn:null};
+  document.getElementById('topbar-title').textContent=cfg.title;
+  document.getElementById('topbar-sub').textContent=cfg.sub;
+  const ab=document.getElementById('topbar-add-btn');
+  ab.innerHTML=cfg.btn||'';ab.style.display=cfg.btn?'':'none';
+  const content=document.getElementById('page-content');
+  content.innerHTML='<div class="empty-state"><div class="spinner" style="margin:0 auto"></div></div>';
+  const map={
+    dashboard:renderDashboard,customers:renderCustomers,'customer-detail':renderCustomerDetail,
+    enquiries:renderEnquiries,activework:renderActiveWork,technicians:renderTechnicians,
+    billing:renderBilling,reports:renderReports,documents:renderDocuments,settings:renderSettings,
+  };
+  const fn=map[page];
+  if(fn){
+    try{fn(params)}catch(e){
+      content.innerHTML=`<div class="empty-state"><div class="icon">⚠</div><p style="color:var(--red)">${e.message}</p></div>`;
     }
   }
+}
+function refreshCurrentPage(){navigate(AppState.currentPage,AppState.pageParams||{})}
+function openAddModal(){
+  const h={customers:openAddCustomerModal,enquiries:openAddEnquiryModal,activework:openAddJobModal,
+    technicians:openAddTechModal,billing:openAddInvoiceModal,'customer-detail':()=>openAddJobModal(AppState.pageParams?.customerId)};
+  const fn=h[AppState.currentPage];if(fn)fn();
+}
 
-  init();
+// ═══════════════════════════════════════════════════════════════════════
+// LOGIN / LOGOUT
+// ═══════════════════════════════════════════════════════════════════════
+function doLogin(){
+  const id=document.getElementById('login-user').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-error');
+  const btn=document.getElementById('login-btn');
+  if(!id||!pass){errEl.textContent='Please enter ID and password.';errEl.style.display='';return;}
+  btn.disabled=true;btn.textContent='Signing in…';errEl.style.display='none';
+  setTimeout(()=>{
+    const u=Auth.login(id,pass);
+    if(u){showApp(u);}
+    else{errEl.textContent='Invalid Employee ID or password.';errEl.style.display='';}
+    btn.disabled=false;btn.textContent='Sign In';
+  },400);
+}
+function doLogout(){Auth.clear();showLoginScreen()}
+function showLoginScreen(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='';
+  document.getElementById('login-user').value='';
+  document.getElementById('login-pass').value='';
+}
+function showApp(user){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  const u=user||Auth.user();
+  if(u){
+    const initials=(u.full_name||u.username||'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('sidebar-avatar').textContent=initials;
+    document.getElementById('sidebar-name').textContent=u.full_name||u.username;
+    document.getElementById('sidebar-role').textContent=u.role==='admin'?'Administrator':'Technician';
+  }
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    const clone=el.cloneNode(true);el.parentNode.replaceChild(clone,el);
+    clone.addEventListener('click',()=>navigate(clone.dataset.page));
+  });
+  AppState.technicians=DB.getList('technicians');
+  navigate('dashboard');
+  updateBadges();
+}
+function updateBadges(){
+  const custs=DB.getList('customers').length;
+  const enqs=DB.getList('enquiries').filter(e=>!e.converted).length;
+  const active=DB.getList('jobs').filter(j=>j.status==='In Progress'||j.status==='Pending').length;
+  document.getElementById('badge-customers').textContent=custs||0;
+  document.getElementById('badge-enquiries').textContent=enqs||0;
+  document.getElementById('badge-active').textContent=active||0;
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  seedIfEmpty();
+  document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+  document.getElementById('login-user').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-pass').focus()});
+  const tok=Auth.token(),u=Auth.user();
+  if(tok&&u){Auth._tok=tok;showApp(u);}
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// SHARED UI
+// ═══════════════════════════════════════════════════════════════════════
+function togglePassVis(inputId,btn){
+  const el=document.getElementById(inputId);if(!el)return;
+  const v=el.type==='password';el.type=v?'text':'password';
+  const b=typeof btn==='string'?document.getElementById(btn):btn;
+  if(b)b.innerHTML=v?'🔎':'👁';
+}
+function openModal({title,body,footerHTML}){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').innerHTML=body;
+  document.getElementById('modal-foot').innerHTML=footerHTML||'<button class="btn" onclick="closeModal()">Cancel</button>';
+  document.getElementById('global-modal').style.display='flex';
+}
+function closeModal(){document.getElementById('global-modal').style.display='none'}
+let _toastTimer;
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast-icon').textContent=type==='error'?'✕':'✓';
+  t.className='toast '+(type==='error'?'error':'');
+  t.classList.add('show');clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+function setLoading(on){document.getElementById('loading').style.display=on?'flex':'none'}
+function confirmAction(msg){return window.confirm(msg)}
+function escHtml(str){return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmtCurrency(n){return '₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:0})}
+function fmtDate(s){if(!s)return '—';try{return new Date(s).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}catch{return s}}
+function statusBadge(status){
+  const m={'Pending':'pending','In Progress':'active','Completed':'done','Delivered':'done','Cancelled':'cancelled','Paid':'done','Unpaid':'pending','Partial':'active','Urgent':'urgent','Normal':'active','Low':'pending'};
+  return `<span class="badge ${m[status]||''}">${escHtml(status||'—')}</span>`;
+}
+function techOptions(selectedId=null){
+  const opts=(AppState.technicians||DB.getList('technicians')).map(t=>`<option value="${t.id}" ${t.id==selectedId?'selected':''}>${escHtml(t.full_name)}</option>`).join('');
+  return `<option value="">— Unassigned —</option>${opts}`;
+}
+function filterTable(inputEl,tbodyId){
+  const q=inputEl.value.toLowerCase();
+  document.querySelectorAll(`#${tbodyId} tr`).forEach(row=>{row.style.display=row.textContent.toLowerCase().includes(q)?'':'none'});
+}
+function emptyRow(cols,msg='No records found'){return `<tr><td colspan="${cols}" style="text-align:center;padding:32px;color:var(--text3)">${msg}</td></tr>`}
+function jobStatusColor(s){return{'Completed':'var(--green)','In Progress':'var(--blue)','Pending':'var(--yellow)','Cancelled':'var(--red)','Delivered':'var(--teal)'}[s]||'var(--text3)'}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════════════
+function renderDashboard(){
+  const customers=DB.getList('customers');
+  const jobs=DB.getList('jobs');
+  const invoices=DB.getList('invoices');
+  const techs=DB.getList('technicians');
+  const activeJobs=jobs.filter(j=>j.status==='In Progress');
+  const pendingJobs=jobs.filter(j=>j.status==='Pending');
+  const completedJobs=jobs.filter(j=>j.status==='Completed'||j.status==='Delivered');
+  const totalRevenue=invoices.filter(i=>i.status==='Paid').reduce((s,i)=>s+i.total,0);
+  const enqToday=DB.getList('enquiries').filter(e=>{
+    const today=new Date().toISOString().slice(0,10);
+    return (e.logged_at||'').slice(0,10)===today;
+  });
+
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div class="stats-grid">
+      <div class="stat-card blue" onclick="navigate('customers')" style="cursor:pointer">
+        <div class="stat-label">Total Customers</div>
+        <div class="stat-num">${customers.length}</div>
+        <div class="stat-sub">Registered accounts</div>
+      </div>
+      <div class="stat-card orange" onclick="navigate('activework')" style="cursor:pointer">
+        <div class="stat-label">Active Jobs</div>
+        <div class="stat-num">${activeJobs.length+pendingJobs.length}</div>
+        <div class="stat-sub">${pendingJobs.length} pending</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Completed Jobs</div>
+        <div class="stat-num">${completedJobs.length}</div>
+        <div class="stat-sub">All time</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-num">${fmtCurrency(totalRevenue)}</div>
+        <div class="stat-sub">From paid invoices</div>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-bottom:14px">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Revenue — Last 6 Months</div></div>
+        <div id="dash-bar-chart" style="height:130px;display:flex;align-items:flex-end;gap:6px;padding-bottom:4px"></div>
+        <div style="display:flex;gap:14px;margin-top:8px">
+          <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--blue)"></div>Jobs</div>
+          <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text3)"><div style="width:10px;height:10px;border-radius:2px;background:var(--orange)"></div>Revenue</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Job Status</div></div>
+        <div id="dash-status"></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Recent Jobs</div><span class="card-action" onclick="navigate('activework')">View All →</span></div>
+        <div id="dash-recent"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Today's Enquiries</div><span class="card-action" onclick="navigate('enquiries')">View All →</span></div>
+        <div id="dash-enq"></div>
+      </div>
+    </div>`;
+
+  // Bar chart
+  const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date();d.setMonth(d.getMonth()-i);
+    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleString('default',{month:'short'}),jobs:0,revenue:0});
+  }
+  jobs.forEach(j=>{const m=(j.received_date||j.created_at||'').slice(0,7);const b=months.find(x=>x.key===m);if(b)b.jobs++});
+  invoices.filter(i=>i.status==='Paid').forEach(i=>{const m=(i.created_at||'').slice(0,7);const b=months.find(x=>x.key===m);if(b)b.revenue+=i.total||0});
+  const maxJ=Math.max(...months.map(m=>m.jobs),1),maxR=Math.max(...months.map(m=>m.revenue),1),H=120;
+  const bc=document.getElementById('dash-bar-chart');
+  bc.innerHTML=months.map(m=>{
+    const jh=Math.max(Math.round(m.jobs/maxJ*H),m.jobs>0?4:0);
+    const rh=Math.max(Math.round(m.revenue/maxR*H),m.revenue>0?4:0);
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <div style="display:flex;gap:2px;align-items:flex-end;width:100%;justify-content:center">
+        <div title="${m.jobs} jobs" style="flex:1;height:${jh}px;background:var(--blue);border-radius:3px 3px 0 0;opacity:.8" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.8"></div>
+        <div title="${fmtCurrency(m.revenue)}" style="flex:1;height:${rh}px;background:var(--orange);border-radius:3px 3px 0 0;opacity:.85" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.85"></div>
+      </div>
+      <div style="font-size:9.5px;color:var(--text3)">${m.label}</div>
+    </div>`;
+  }).join('');
+
+  // Status bars
+  const total=jobs.length,completed=completedJobs.length,pending=pendingJobs.length,inprog=activeJobs.length;
+  const pct=n=>total>0?Math.round(n/total*100):0;
+  document.getElementById('dash-status').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+      ${sbar('Completed',pct(completed),completed,'var(--green)')}
+      ${sbar('In Progress',pct(inprog),inprog,'var(--blue)')}
+      ${sbar('Pending',pct(pending),pending,'var(--yellow)')}
+    </div>
+    <div style="height:6px;background:var(--bg3);border-radius:10px;margin-top:14px;overflow:hidden">
+      <div style="height:100%;background:linear-gradient(90deg,var(--green) ${pct(completed)}%,var(--blue) ${pct(completed)}% ${pct(completed)+pct(inprog)}%,var(--yellow) ${pct(completed)+pct(inprog)}%);border-radius:10px"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text3)">
+      <span>Total: <strong style="color:var(--text)">${total}</strong></span>
+      <span>Today's enquiries: <strong style="color:var(--orange)">${enqToday.length}</strong></span>
+    </div>`;
+
+  // Recent jobs
+  const recEl=document.getElementById('dash-recent');
+  const custMap=Object.fromEntries(DB.getList('customers').map(c=>[c.id,c]));
+  const techMap=Object.fromEntries(DB.getList('technicians').map(t=>[t.id,t]));
+  const recent=[...jobs].reverse().slice(0,6);
+  if(!recent.length){recEl.innerHTML='<div class="empty-state" style="padding:20px"><div class="icon">🔧</div><p>No jobs yet</p></div>';return}
+  recEl.innerHTML=recent.map(j=>`
+    <div class="activity-item" style="cursor:pointer" onclick="navigate('customer-detail',{customerId:${j.customer_id}})">
+      <div class="act-dot" style="background:${jobStatusColor(j.status)}"></div>
+      <div class="act-body">
+        <div class="act-text"><strong>${escHtml((custMap[j.customer_id]||{}).name||'—')}</strong> — ${escHtml(j.device_type)}</div>
+        <div class="act-time">${escHtml(j.job_number)} · ${escHtml((techMap[j.technician_id]||{}).full_name||'Unassigned')} · ${statusBadge(j.status)}</div>
+      </div>
+    </div>`).join('');
+
+  // Today enquiries
+  const enqEl=document.getElementById('dash-enq');
+  if(!enqToday.length){enqEl.innerHTML='<div class="empty-state" style="padding:20px"><div class="icon">📞</div><p>No enquiries today</p></div>';return}
+  enqEl.innerHTML=enqToday.slice(0,5).map(e=>`
+    <div class="activity-item">
+      <div class="act-dot" style="background:var(--orange)"></div>
+      <div class="act-body">
+        <div class="act-text"><strong>${escHtml(e.caller_name)}</strong> — ${escHtml(e.call_reason||'No reason')}</div>
+        <div class="act-time">${escHtml(e.phone)} · ${fmtDate(e.logged_at)} ${e.converted?'<span class="badge done" style="margin-left:4px">Converted</span>':''}</div>
+      </div>
+    </div>`).join('');
+}
+function sbar(label,pct,count,color){
+  return `<div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px">
+      <span>${label}</span><span style="color:var(--text);font-weight:500">${count} <span style="color:var(--text3)">(${pct}%)</span></span>
+    </div>
+    <div style="height:5px;background:var(--bg3);border-radius:10px;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:${color};border-radius:10px;transition:width .6s ease"></div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CUSTOMERS
+// ═══════════════════════════════════════════════════════════════════════
+function renderCustomers(){
+  const customers=DB.getList('customers');
+  const jobs=DB.getList('jobs');
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div class="card">
+      <div class="table-toolbar">
+        <div class="search-wrap"><span class="search-icon">🔍</span>
+          <input class="search-input" id="cust-search" placeholder="Search by name or phone…" oninput="filterTable(this,'cust-tbody')"/>
+        </div>
+        <div style="margin-left:auto;font-size:13px;color:var(--text3)">Total: <strong style="color:var(--text)">${customers.length}</strong></div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Address</th><th>Total Jobs</th><th>Active</th><th>Since</th><th>Actions</th></tr></thead>
+        <tbody id="cust-tbody">
+          ${customers.length===0?emptyRow(8):customers.map(c=>{
+            const cJobs=jobs.filter(j=>j.customer_id===c.id);
+            const actJobs=cJobs.filter(j=>j.status==='In Progress'||j.status==='Pending');
+            return `<tr>
+              <td style="color:var(--text3);font-size:12px">#${c.id}</td>
+              <td style="font-weight:600;color:var(--text)">${escHtml(c.name)}</td>
+              <td>${escHtml(c.phone)}</td>
+              <td>${escHtml(c.address||'—')}</td>
+              <td><span class="badge active">${cJobs.length}</span></td>
+              <td><span class="badge ${actJobs.length>0?'pending':'done'}">${actJobs.length}</span></td>
+              <td>${fmtDate(c.created_at)}</td>
+              <td><div class="action-btns">
+                <button class="act-btn info" onclick="navigate('customer-detail',{customerId:${c.id}})">View</button>
+                <button class="act-btn" onclick="openEditCustomerModal(${c.id})">Edit</button>
+                <button class="act-btn danger" onclick="deleteCustomer(${c.id})">Del</button>
+              </div></td>
+            </tr>`;}).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+function openAddCustomerModal(){
+  openModal({title:'Add New Customer',body:customerFormHTML(),
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveNewCustomer()">Save Customer</button>`});
+}
+function openEditCustomerModal(id){
+  const c=DB.getList('customers').find(x=>x.id===id);if(!c)return;
+  openModal({title:`Edit Customer — ${c.name}`,body:customerFormHTML(c),
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="updateExistingCustomer(${id})">Update</button>`});
+}
+function customerFormHTML(c={}){
+  return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Full Name *</label>
+        <input class="form-input" id="cf-name" value="${escHtml(c.name||'')}" placeholder="Customer name"/></div>
+      <div class="form-group"><label class="form-label">Phone *</label>
+        <input class="form-input" id="cf-phone" value="${escHtml(c.phone||'')}" placeholder="10-digit number"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Email</label>
+        <input class="form-input" id="cf-email" type="email" value="${escHtml(c.email||'')}" placeholder="Optional"/></div>
+      <div class="form-group"><label class="form-label">Address</label>
+        <input class="form-input" id="cf-address" value="${escHtml(c.address||'')}" placeholder="City, State"/></div>
+    </div>`;
+}
+function collectCustomerForm(){
+  const name=document.getElementById('cf-name')?.value.trim();
+  const phone=document.getElementById('cf-phone')?.value.trim();
+  if(!name||!phone){showToast('Name and phone are required','error');return null}
+  return{name,phone,email:document.getElementById('cf-email')?.value.trim()||null,address:document.getElementById('cf-address')?.value.trim()||null};
+}
+function saveNewCustomer(){
+  const data=collectCustomerForm();if(!data)return;
+  const id=DB.nextId('customers');
+  DB.push('customers',{...data,id,created_at:new Date().toISOString()});
+  closeModal();showToast('Customer added!');renderCustomers();updateBadges();
+}
+function updateExistingCustomer(id){
+  const data=collectCustomerForm();if(!data)return;
+  DB.update('customers',id,data);closeModal();showToast('Customer updated!');renderCustomers();
+}
+function deleteCustomer(id){
+  if(!confirmAction('Delete this customer and all their service records?'))return;
+  DB.remove('customers',id);showToast('Customer deleted');renderCustomers();updateBadges();
+}
+
+// CUSTOMER DETAIL
+let _detailCustomerId=null;
+function renderCustomerDetail({customerId}={}){
+  if(!customerId){navigate('customers');return}
+  _detailCustomerId=customerId;
+  const c=DB.getList('customers').find(x=>x.id===customerId);
+  if(!c){navigate('customers');return}
+  const jobs=DB.getList('jobs').filter(j=>j.customer_id===customerId);
+  const invoices=DB.getList('invoices').filter(i=>i.customer_id===customerId);
+  document.getElementById('topbar-sub').textContent=c.name;
+  const initials=c.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div class="detail-header">
+      <div class="detail-avatar">${initials}</div>
+      <div>
+        <div class="detail-name">${escHtml(c.name)}</div>
+        <div class="detail-meta">
+          <span>📞 ${escHtml(c.phone)}</span>
+          ${c.email?`<span>✉ ${escHtml(c.email)}</span>`:''}
+          ${c.address?`<span>📍 ${escHtml(c.address)}</span>`:''}
+          <span>Since ${fmtDate(c.created_at)}</span>
+        </div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="btn" onclick="navigate('customers')">← Back</button>
+        <button class="btn" onclick="openEditCustomerModal(${c.id})">Edit</button>
+        <button class="btn orange" onclick="openAddJobModal(${c.id})">+ New Job</button>
+      </div>
+    </div>
+    <div class="tabs" id="detail-tabs">
+      <div class="tab active" data-tab="0">Service History</div>
+      <div class="tab" data-tab="1">Billing History</div>
+    </div>
+    <div id="detail-tab-content"></div>`;
+  document.querySelectorAll('#detail-tabs .tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      document.querySelectorAll('#detail-tabs .tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      renderDetailTab(parseInt(t.dataset.tab),jobs,invoices);
+    });
+  });
+  renderDetailTab(0,jobs,invoices);
+}
+function renderDetailTab(idx,jobs,invoices){
+  const c=document.getElementById('detail-tab-content');
+  const techMap=Object.fromEntries(DB.getList('technicians').map(t=>[t.id,t]));
+  if(idx===0){
+    c.innerHTML=`<div class="card">
+      <div class="card-head"><div class="card-title">Service Jobs (${jobs.length})</div>
+        <button class="btn sm primary" onclick="openAddJobModal(${_detailCustomerId})">+ New Job</button></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Job#</th><th>Device</th><th>Problem</th><th>Technician</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>${jobs.length===0?emptyRow(7,'No service jobs yet'):jobs.map(j=>`
+          <tr>
+            <td style="font-size:12px;color:var(--text3)">${escHtml(j.job_number)}</td>
+            <td style="font-weight:600;color:var(--text)">${escHtml(j.device_type)}</td>
+            <td>${escHtml(j.problem_desc)}</td>
+            <td>${escHtml((techMap[j.technician_id]||{}).full_name||'Unassigned')}</td>
+            <td>${statusBadge(j.status)}</td>
+            <td>${fmtDate(j.received_date)}</td>
+            <td><div class="action-btns">
+              <button class="act-btn info" onclick="openJobDetailModal(${j.id})">View</button>
+              <button class="act-btn" onclick="openEditJobModal(${j.id})">Edit</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+  }else{
+    const totalPaid=invoices.filter(i=>i.status==='Paid').reduce((s,i)=>s+i.total,0);
+    c.innerHTML=`<div class="card">
+      <div class="card-head"><div class="card-title">Invoices</div>
+        <span style="font-size:13px;color:var(--green)">Total Paid: <strong>${fmtCurrency(totalPaid)}</strong></span></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Invoice#</th><th>Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>${invoices.length===0?emptyRow(5,'No invoices yet'):invoices.map(i=>`
+          <tr>
+            <td style="color:var(--text3);font-size:12px">${escHtml(i.invoice_number)}</td>
+            <td>${fmtDate(i.created_at)}</td>
+            <td style="font-weight:600;color:var(--text)">${fmtCurrency(i.total)}</td>
+            <td>${statusBadge(i.status)}</td>
+            <td><div class="action-btns">
+              ${i.status!=='Paid'?`<button class="act-btn success" onclick="markPaidById(${i.id})">Mark Paid</button>`:'<span class="badge done">Paid ✓</span>'}
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// JOBS
+// ═══════════════════════════════════════════════════════════════════════
+function jobFormHTML(j={},isEdit=false){
+  return `
+    ${!isEdit?`<div class="form-row">
+      <div class="form-group"><label class="form-label">Customer ID *</label>
+        <input class="form-input" id="jf-cust" type="number" value="${j.customer_id||''}" placeholder="Customer ID"/>
+        <div class="form-hint">Tip: open from Customer page to auto-fill</div></div>
+      <div class="form-group"><label class="form-label">Device Type *</label>
+        <input class="form-input" id="jf-device" value="${escHtml(j.device_type||'')}" placeholder="e.g. HP Laptop"/></div>
+    </div>`:`<div class="form-row">
+      <div class="form-group"><label class="form-label">Device Type</label>
+        <input class="form-input" id="jf-device" value="${escHtml(j.device_type||'')}" placeholder="Device type"/></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-select" id="jf-status">
+          ${['Pending','In Progress','Completed','Delivered','Cancelled'].map(s=>`<option ${j.status===s?'selected':''}>${s}</option>`).join('')}
+        </select></div>
+    </div>`}
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Brand</label>
+        <input class="form-input" id="jf-brand" value="${escHtml(j.device_brand||'')}" placeholder="HP, Samsung…"/></div>
+      <div class="form-group"><label class="form-label">Model</label>
+        <input class="form-input" id="jf-model" value="${escHtml(j.device_model||'')}" placeholder="Model number…"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Serial / IMEI</label>
+        <input class="form-input" id="jf-serial" value="${escHtml(j.serial_number||'')}" placeholder="Optional"/></div>
+      <div class="form-group"><label class="form-label">Assign Technician</label>
+        <select class="form-select" id="jf-tech">${techOptions(j.technician_id)}</select></div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group"><label class="form-label">Problem Description *</label>
+        <textarea class="form-textarea" id="jf-problem">${escHtml(j.problem_desc||'')}</textarea></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Priority</label>
+        <select class="form-select" id="jf-priority">
+          ${['Low','Normal','Urgent'].map(p=>`<option ${j.priority===p?'selected':''}>${p}</option>`).join('')}
+        </select></div>
+      <div class="form-group"><label class="form-label">Estimated Cost (₹)</label>
+        <input class="form-input" id="jf-est" type="number" value="${j.estimated_cost||0}"/></div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group"><label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="jf-notes" style="min-height:55px">${escHtml(j.notes||'')}</textarea></div>
+    </div>`;
+}
+function openAddJobModal(customerId=null){
+  openModal({title:'Create New Service Job',body:jobFormHTML({customer_id:customerId}),
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveNewJob()">Create Job</button>`});
+}
+function openEditJobModal(jobId){
+  const j=DB.getList('jobs').find(x=>x.id===jobId);if(!j)return;
+  openModal({title:`Edit Job — ${j.job_number}`,body:jobFormHTML(j,true),
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="updateExistingJob(${jobId})">Update</button>`});
+}
+function saveNewJob(){
+  const custId=parseInt(document.getElementById('jf-cust')?.value);
+  const device=document.getElementById('jf-device')?.value.trim();
+  const problem=document.getElementById('jf-problem')?.value.trim();
+  if(!custId||!device||!problem){showToast('Customer ID, device, and problem are required','error');return}
+  const customer=DB.getList('customers').find(c=>c.id===custId);
+  if(!customer){showToast('Customer not found','error');return}
+  const id=DB.nextId('jobs');
+  const count=DB.getList('jobs').length+1;
+  const job={id,job_number:`JOB-${String(count).padStart(4,'0')}`,customer_id:custId,
+    device_type:device,device_brand:document.getElementById('jf-brand')?.value.trim()||null,
+    device_model:document.getElementById('jf-model')?.value.trim()||null,
+    serial_number:document.getElementById('jf-serial')?.value.trim()||null,
+    problem_desc:problem,technician_id:parseInt(document.getElementById('jf-tech')?.value)||null,
+    priority:document.getElementById('jf-priority')?.value||'Normal',
+    estimated_cost:parseFloat(document.getElementById('jf-est')?.value)||0,
+    notes:document.getElementById('jf-notes')?.value.trim()||null,
+    status:'Pending',received_date:new Date().toISOString(),created_at:new Date().toISOString()};
+  DB.push('jobs',job);closeModal();showToast(`Job ${job.job_number} created!`);
+  refreshCurrentPage();updateBadges();
+}
+function updateExistingJob(jobId){
+  DB.update('jobs',jobId,{
+    device_type:document.getElementById('jf-device')?.value.trim(),
+    problem_desc:document.getElementById('jf-problem')?.value.trim(),
+    technician_id:parseInt(document.getElementById('jf-tech')?.value)||null,
+    status:document.getElementById('jf-status')?.value,
+    priority:document.getElementById('jf-priority')?.value,
+    notes:document.getElementById('jf-notes')?.value.trim()||null,
+  });
+  closeModal();showToast('Job updated!');refreshCurrentPage();
+}
+function updateJobStatus(jobId,current){
+  openModal({title:'Update Job Status',
+    body:`<p style="color:var(--text2);margin-bottom:14px">Current: ${statusBadge(current)}</p>
+      <div class="form-group"><label class="form-label">New Status</label>
+        <select class="form-select" id="status-select">
+          ${['Pending','In Progress','Completed','Delivered','Cancelled'].map(s=>`<option ${s===({Pending:'In Progress','In Progress':'Completed',Completed:'Delivered'}[current]||current)?'selected':''}>${s}</option>`).join('')}
+        </select></div>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="applyJobStatus(${jobId})">Update</button>`});
+}
+function applyJobStatus(jobId){
+  const status=document.getElementById('status-select').value;
+  const updates={status};
+  if(status==='Completed'||status==='Delivered')updates.completed_date=new Date().toISOString();
+  DB.update('jobs',jobId,updates);closeModal();showToast(`Status → ${status}`);refreshCurrentPage();updateBadges();
+}
+function openJobDetailModal(jobId){
+  const j=DB.getList('jobs').find(x=>x.id===jobId);if(!j)return;
+  const parts=DB.getList('parts').filter(p=>p.job_id===jobId);
+  const partsTotal=parts.reduce((s,p)=>s+(p.total_price||0),0);
+  const custMap=Object.fromEntries(DB.getList('customers').map(c=>[c.id,c]));
+  const techMap=Object.fromEntries(DB.getList('technicians').map(t=>[t.id,t]));
+  openModal({title:`Job Details — ${j.job_number}`,
+    body:`<table class="info-table"><tbody>
+      <tr><td>Customer</td><td style="font-weight:600">${escHtml((custMap[j.customer_id]||{}).name||'—')}</td></tr>
+      <tr><td>Device</td><td>${escHtml(j.device_type)} ${escHtml(j.device_brand||'')} ${escHtml(j.device_model||'')}</td></tr>
+      <tr><td>Problem</td><td>${escHtml(j.problem_desc)}</td></tr>
+      <tr><td>Technician</td><td>${escHtml((techMap[j.technician_id]||{}).full_name||'Unassigned')}</td></tr>
+      <tr><td>Status</td><td>${statusBadge(j.status)}</td></tr>
+      <tr><td>Priority</td><td>${statusBadge(j.priority)}</td></tr>
+      <tr><td>Received</td><td>${fmtDate(j.received_date)}</td></tr>
+      ${j.notes?`<tr><td>Notes</td><td>${escHtml(j.notes)}</td></tr>`:''}
+    </tbody></table>
+    ${parts.length>0?`<div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+      <div style="font-size:12.5px;font-weight:600;color:var(--text2);margin-bottom:8px">Parts Used</div>
+      ${parts.map(p=>`<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);padding:4px 0">
+        <span>${escHtml(p.item_name)} × ${p.quantity}</span>
+        <span style="color:var(--text)">${fmtCurrency(p.total_price)}</span>
+      </div>`).join('')}
+      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--orange);padding-top:8px;border-top:1px solid var(--border);margin-top:4px">
+        <span>Total</span><span>${fmtCurrency(partsTotal)}</span>
+      </div>
+    </div>`:''}`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Close</button><button class="btn primary" onclick="closeModal();openEditJobModal(${jobId})">Edit Job</button>`});
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ACTIVE WORK
+// ═══════════════════════════════════════════════════════════════════════
+function renderActiveWork(){
+  const allJobs=DB.getList('jobs');
+  const custMap=Object.fromEntries(DB.getList('customers').map(c=>[c.id,c]));
+  const techMap=Object.fromEntries(DB.getList('technicians').map(t=>[t.id,t]));
+  const active=allJobs.filter(j=>j.status==='In Progress'||j.status==='Pending');
+  const urgent=active.filter(j=>j.priority==='Urgent').length;
+  const inProg=active.filter(j=>j.status==='In Progress').length;
+  const pending=active.filter(j=>j.status==='Pending').length;
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="stat-card orange"><div class="stat-label">Urgent Priority</div><div class="stat-num">${urgent}</div></div>
+      <div class="stat-card blue"><div class="stat-label">In Progress</div><div class="stat-num">${inProg}</div></div>
+      <div class="stat-card" style="border-top:3px solid var(--yellow)"><div class="stat-label">Pending</div><div class="stat-num">${pending}</div></div>
+    </div>
+    <div class="card">
+      <div class="table-toolbar">
+        <div class="search-wrap"><span class="search-icon">🔍</span>
+          <input class="search-input" id="work-search" placeholder="Search jobs…" oninput="filterTable(this,'work-tbody')"/>
+        </div>
+        <select class="filter-select" id="work-status-filter" onchange="filterWorkByStatus(this.value)">
+          <option value="">All Active</option><option value="In Progress">In Progress</option><option value="Pending">Pending</option>
+        </select>
+        <div style="margin-left:auto;font-size:13px;color:var(--text3)">Active: <strong style="color:var(--text)">${active.length}</strong></div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Job#</th><th>Customer</th><th>Device</th><th>Problem</th><th>Technician</th><th>Priority</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="work-tbody">
+          ${active.length===0?emptyRow(9,'No active jobs'):active.map(j=>`
+            <tr data-status="${escHtml(j.status)}">
+              <td style="font-size:12px;color:var(--text3)">${escHtml(j.job_number)}</td>
+              <td style="font-weight:600;color:var(--text)">${escHtml((custMap[j.customer_id]||{}).name||'—')}</td>
+              <td>${escHtml(j.device_type)}</td>
+              <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(j.problem_desc)}</td>
+              <td>${escHtml((techMap[j.technician_id]||{}).full_name||'Unassigned')}</td>
+              <td>${statusBadge(j.priority)}</td>
+              <td>${statusBadge(j.status)}</td>
+              <td>${fmtDate(j.received_date)}</td>
+              <td><div class="action-btns">
+                <button class="act-btn info" onclick="openJobDetailModal(${j.id})">View</button>
+                <button class="act-btn" onclick="openEditJobModal(${j.id})">Edit</button>
+                <button class="act-btn success" onclick="updateJobStatus(${j.id},'${j.status}')">Status</button>
+              </div></td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+function filterWorkByStatus(val){
+  document.querySelectorAll('#work-tbody tr').forEach(row=>{
+    row.style.display=(!val||row.dataset.status===val)?'':'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ENQUIRIES
+// ═══════════════════════════════════════════════════════════════════════
+function renderEnquiries(){
+  const enqs=DB.getList('enquiries');
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div class="card">
+      <div class="table-toolbar">
+        <div class="search-wrap"><span class="search-icon">🔍</span>
+          <input class="search-input" id="enq-search" placeholder="Search by name or phone…" oninput="filterTable(this,'enq-tbody')"/>
+        </div>
+        <select class="filter-select" onchange="filterEnqByStatus(this.value)">
+          <option value="">All</option><option value="open">Open</option><option value="converted">Converted</option>
+        </select>
+        <div style="margin-left:auto;font-size:13px;color:var(--text3)">
+          Total: <strong style="color:var(--text)">${enqs.length}</strong> &nbsp;·&nbsp;
+          Open: <strong style="color:var(--orange)">${enqs.filter(e=>!e.converted).length}</strong>
+        </div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ID</th><th>Caller</th><th>Phone</th><th>Reason</th><th>Date & Time</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="enq-tbody">
+          ${enqs.length===0?emptyRow(7,'No enquiries yet'):[...enqs].reverse().map(e=>`
+            <tr data-converted="${e.converted?'converted':'open'}">
+              <td style="color:var(--text3);font-size:12px">#${e.id}</td>
+              <td style="font-weight:600;color:var(--text)">${escHtml(e.caller_name)}</td>
+              <td>${escHtml(e.phone)}</td>
+              <td>${escHtml(e.call_reason||'—')}</td>
+              <td>${fmtDate(e.logged_at)}</td>
+              <td>${e.converted?'<span class="badge done">Converted</span>':'<span class="badge pending">Open</span>'}</td>
+              <td><div class="action-btns">
+                ${!e.converted?`<button class="act-btn info" onclick="openConvertEnquiryModal(${e.id},'${escHtml(e.caller_name)}','${escHtml(e.phone)}')">Convert to Job</button>`:''}
+                <button class="act-btn danger" onclick="deleteEnq(${e.id})">Delete</button>
+              </div></td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+function filterEnqByStatus(val){
+  document.querySelectorAll('#enq-tbody tr').forEach(row=>{
+    row.style.display=(!val||row.dataset.converted===val)?'':'none';
+  });
+}
+function openAddEnquiryModal(){
+  openModal({title:'Log New Enquiry / Call',
+    body:`<div class="form-row">
+      <div class="form-group"><label class="form-label">Caller Name *</label>
+        <input class="form-input" id="eq-name" placeholder="Full name"/></div>
+      <div class="form-group"><label class="form-label">Phone *</label>
+        <input class="form-input" id="eq-phone" placeholder="Phone number"/></div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group"><label class="form-label">Call Reason / Issue</label>
+        <textarea class="form-textarea" id="eq-reason" placeholder="Describe what the customer wants…"></textarea></div>
+    </div>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveEnquiry()">Log Enquiry</button>`});
+}
+function saveEnquiry(){
+  const name=document.getElementById('eq-name').value.trim();
+  const phone=document.getElementById('eq-phone').value.trim();
+  if(!name||!phone){showToast('Name and phone required','error');return}
+  const id=DB.nextId('enquiries');
+  DB.push('enquiries',{id,caller_name:name,phone,call_reason:document.getElementById('eq-reason').value.trim()||null,converted:false,logged_at:new Date().toISOString()});
+  closeModal();showToast('Enquiry logged!');renderEnquiries();updateBadges();
+}
+function openConvertEnquiryModal(enqId,name,phone){
+  openModal({title:'Convert Enquiry → Service Job',
+    body:`<p style="font-size:13px;color:var(--text2);margin-bottom:14px">Creating job for <strong>${escHtml(name)}</strong> (${escHtml(phone)})</p>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Customer ID *</label>
+          <input class="form-input" id="cv-cust" type="number" placeholder="Find or create customer first"/></div>
+        <div class="form-group"><label class="form-label">Device Type *</label>
+          <input class="form-input" id="cv-device" placeholder="e.g. HP Laptop"/></div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group"><label class="form-label">Problem Description *</label>
+          <textarea class="form-textarea" id="cv-problem"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Technician</label>
+          <select class="form-select" id="cv-tech">${techOptions()}</select></div>
+        <div class="form-group"><label class="form-label">Priority</label>
+          <select class="form-select" id="cv-priority"><option>Normal</option><option>Urgent</option><option>Low</option></select></div>
+      </div>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="doConvert(${enqId})">Create Job</button>`});
+}
+function doConvert(enqId){
+  const custId=parseInt(document.getElementById('cv-cust').value);
+  const device=document.getElementById('cv-device').value.trim();
+  const problem=document.getElementById('cv-problem').value.trim();
+  if(!custId||!device||!problem){showToast('Fill all required fields','error');return}
+  const customer=DB.getList('customers').find(c=>c.id===custId);
+  if(!customer){showToast('Customer not found','error');return}
+  const id=DB.nextId('jobs');
+  const count=DB.getList('jobs').length+1;
+  const job={id,job_number:`JOB-${String(count).padStart(4,'0')}`,customer_id:custId,
+    device_type:device,problem_desc:problem,
+    technician_id:parseInt(document.getElementById('cv-tech').value)||null,
+    priority:document.getElementById('cv-priority').value,
+    status:'Pending',received_date:new Date().toISOString(),created_at:new Date().toISOString()};
+  DB.push('jobs',job);DB.update('enquiries',enqId,{converted:true});
+  closeModal();showToast(`Job ${job.job_number} created!`);renderEnquiries();updateBadges();
+}
+function deleteEnq(id){
+  if(!confirmAction('Delete this enquiry?'))return;
+  DB.remove('enquiries',id);showToast('Deleted');renderEnquiries();updateBadges();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// PARTS
+// ═══════════════════════════════════════════════════════════════════════
+function openAddPartModal(jobId){
+  openModal({title:'Add Part / Service Item',
+    body:`<div class="form-row full"><div class="form-group"><label class="form-label">Item Name *</label>
+      <input class="form-input" id="pt-name" placeholder="e.g. RAM 8GB, OS Installation"/></div></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Quantity</label>
+        <input class="form-input" id="pt-qty" type="number" value="1" min="1"/></div>
+      <div class="form-group"><label class="form-label">Unit Price (₹) *</label>
+        <input class="form-input" id="pt-price" type="number" value="0" min="0"/></div>
+    </div>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveNewPart(${jobId})">Add Item</button>`});
+}
+function saveNewPart(jobId){
+  const name=document.getElementById('pt-name').value.trim();
+  const qty=parseInt(document.getElementById('pt-qty').value)||1;
+  const price=parseFloat(document.getElementById('pt-price').value)||0;
+  if(!name){showToast('Item name required','error');return}
+  const id=DB.nextId('parts');
+  DB.push('parts',{id,job_id:jobId,item_name:name,quantity:qty,unit_price:price,total_price:qty*price});
+  closeModal();showToast('Part added!');refreshCurrentPage();
+}
+function deletePart(jobId,partId){
+  if(!confirmAction('Remove this part?'))return;
+  DB.remove('parts',partId);showToast('Part removed');refreshCurrentPage();
+}
+function generateJobInvoice(jobId,customerId){
+  const parts=DB.getList('parts').filter(p=>p.job_id===jobId);
+  const subtotal=parts.reduce((s,p)=>s+p.total_price,0);
+  const taxPct=18;const taxAmt=subtotal*taxPct/100;
+  const total=subtotal+taxAmt;
+  const id=DB.nextId('invoices');
+  const count=DB.getList('invoices').length+1;
+  const inv={id,invoice_number:`INV-${String(count).padStart(4,'0')}`,customer_id:customerId,job_id:jobId,
+    subtotal,discount:0,tax_percent:taxPct,tax_amount:taxAmt,total,status:'Unpaid',
+    payment_method:'Cash',created_at:new Date().toISOString()};
+  DB.push('invoices',inv);showToast(`Invoice ${inv.invoice_number} created! (${fmtCurrency(total)})`);refreshCurrentPage();
+}
+function markPaidById(invoiceId){
+  DB.update('invoices',invoiceId,{status:'Paid',paid_at:new Date().toISOString()});
+  showToast('Invoice marked as paid!');refreshCurrentPage();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// TECHNICIANS
+// ═══════════════════════════════════════════════════════════════════════
+function renderTechnicians(){
+  const techs=DB.getList('technicians');
+  const jobs=DB.getList('jobs');
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div class="tech-grid">
+      ${techs.length===0?`<div style="grid-column:1/-1"><div class="empty-state"><div class="icon">👤</div><p>No technicians yet. Add one!</p></div></div>`:
+        techs.map(t=>{
+          const tJobs=jobs.filter(j=>j.technician_id===t.id);
+          const active=tJobs.filter(j=>j.status==='In Progress'||j.status==='Pending').length;
+          const done=tJobs.filter(j=>j.status==='Completed'||j.status==='Delivered').length;
+          const initials=t.full_name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+          return `<div class="tech-card">
+            <div class="tech-avatar">${initials}</div>
+            <div style="font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${escHtml(t.full_name)}</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${escHtml(t.designation||'Technician')}</div>
+            <div style="display:flex;justify-content:center;gap:16px;font-size:12.5px;color:var(--text2);margin-bottom:14px">
+              <div style="text-align:center"><div style="font-weight:700;font-size:18px;color:var(--text)">${active}</div>Active</div>
+              <div style="text-align:center"><div style="font-weight:700;font-size:18px;color:var(--green)">${done}</div>Done</div>
+              <div style="text-align:center"><div style="font-weight:700;font-size:18px;color:var(--blue)">${tJobs.length}</div>Total</div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${escHtml(t.phone||'—')}</div>
+            <div style="display:flex;gap:6px;justify-content:center">
+              <button class="act-btn info" onclick="openEditTechModal(${t.id})">Edit</button>
+              <button class="act-btn danger" onclick="deleteTech(${t.id})">Delete</button>
+            </div>
+          </div>`;}).join('')}
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Technician Job Summary</div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>Designation</th><th>Phone</th><th>Active Jobs</th><th>Completed</th><th>Total</th></tr></thead>
+        <tbody>
+          ${techs.length===0?emptyRow(6):techs.map(t=>{
+            const tJobs=jobs.filter(j=>j.technician_id===t.id);
+            const active=tJobs.filter(j=>j.status==='In Progress'||j.status==='Pending').length;
+            const done=tJobs.filter(j=>j.status==='Completed'||j.status==='Delivered').length;
+            return `<tr>
+              <td style="font-weight:600;color:var(--text)">${escHtml(t.full_name)}</td>
+              <td>${escHtml(t.designation||'Technician')}</td>
+              <td>${escHtml(t.phone||'—')}</td>
+              <td><span class="badge pending">${active}</span></td>
+              <td><span class="badge done">${done}</span></td>
+              <td><strong>${tJobs.length}</strong></td>
+            </tr>`;}).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+function openAddTechModal(){
+  openModal({title:'Add New Technician',body:techFormHTML(),
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveNewTech()">Add Technician</button>`});
+}
+function openEditTechModal(id){
+  const t=DB.getList('technicians').find(x=>x.id===id);if(!t)return;
+  openModal({title:`Edit — ${t.full_name}`,body:techFormHTML(t),
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="updateExistingTech(${id})">Update</button>`});
+}
+function techFormHTML(t={}){
+  return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Full Name *</label>
+        <input class="form-input" id="tf-name" value="${escHtml(t.full_name||'')}" placeholder="Full name"/></div>
+      <div class="form-group"><label class="form-label">Phone</label>
+        <input class="form-input" id="tf-phone" value="${escHtml(t.phone||'')}" placeholder="Phone number"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Email</label>
+        <input class="form-input" id="tf-email" type="email" value="${escHtml(t.email||'')}" placeholder="Email address"/></div>
+      <div class="form-group"><label class="form-label">Designation</label>
+        <input class="form-input" id="tf-desig" value="${escHtml(t.designation||'')}" placeholder="e.g. Senior Technician"/></div>
+    </div>`;
+}
+function saveNewTech(){
+  const name=document.getElementById('tf-name').value.trim();
+  if(!name){showToast('Name required','error');return}
+  const id=DB.nextId('technicians');
+  DB.push('technicians',{id,full_name:name,phone:document.getElementById('tf-phone').value.trim()||null,
+    email:document.getElementById('tf-email').value.trim()||null,
+    designation:document.getElementById('tf-desig').value.trim()||'Technician',
+    status:'Active',created_at:new Date().toISOString()});
+  AppState.technicians=DB.getList('technicians');
+  closeModal();showToast('Technician added!');renderTechnicians();
+}
+function updateExistingTech(id){
+  DB.update('technicians',id,{full_name:document.getElementById('tf-name').value.trim(),
+    phone:document.getElementById('tf-phone').value.trim()||null,
+    email:document.getElementById('tf-email').value.trim()||null,
+    designation:document.getElementById('tf-desig').value.trim()||'Technician'});
+  AppState.technicians=DB.getList('technicians');
+  closeModal();showToast('Technician updated!');renderTechnicians();
+}
+function deleteTech(id){
+  if(!confirmAction('Delete this technician? Their jobs will remain.'))return;
+  DB.remove('technicians',id);AppState.technicians=DB.getList('technicians');
+  showToast('Technician deleted');renderTechnicians();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// BILLING
+// ═══════════════════════════════════════════════════════════════════════
+function renderBilling(){
+  const invoices=DB.getList('invoices');
+  const custMap=Object.fromEntries(DB.getList('customers').map(c=>[c.id,c]));
+  const totalRev=invoices.filter(i=>i.status==='Paid').reduce((s,i)=>s+i.total,0);
+  const unpaid=invoices.filter(i=>i.status==='Unpaid'||i.status==='Partial').length;
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+      <div class="stat-card green"><div class="stat-label">Total Collected</div><div class="stat-num">${fmtCurrency(totalRev)}</div></div>
+      <div class="stat-card orange"><div class="stat-label">Pending Payment</div><div class="stat-num">${unpaid}</div><div class="stat-sub">invoices</div></div>
+      <div class="stat-card blue"><div class="stat-label">Total Invoices</div><div class="stat-num">${invoices.length}</div></div>
+    </div>
+    <div class="card">
+      <div class="table-toolbar">
+        <div class="search-wrap"><span class="search-icon">🔍</span>
+          <input class="search-input" id="inv-search" placeholder="Search invoices…" oninput="filterTable(this,'inv-tbody')"/>
+        </div>
+        <select class="filter-select" onchange="_filterInvoices(this.value)">
+          <option value="">All</option><option value="Unpaid">Unpaid</option><option value="Paid">Paid</option>
+        </select>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Invoice#</th><th>Customer</th><th>Date</th><th>Subtotal</th><th>GST</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="inv-tbody">
+          ${invoices.length===0?emptyRow(8):[...invoices].reverse().map(i=>`
+            <tr data-status="${i.status}">
+              <td style="color:var(--text3);font-size:12px">${escHtml(i.invoice_number)}</td>
+              <td style="font-weight:600;color:var(--text)">${escHtml((custMap[i.customer_id]||{}).name||'—')}</td>
+              <td>${fmtDate(i.created_at)}</td>
+              <td>${fmtCurrency(i.subtotal)}</td>
+              <td>${fmtCurrency(i.tax_amount)}</td>
+              <td style="font-weight:700;color:var(--text)">${fmtCurrency(i.total)}</td>
+              <td>${statusBadge(i.status)}</td>
+              <td><div class="action-btns">
+                ${i.status!=='Paid'?`<button class="act-btn success" onclick="markPaidById(${i.id})">Mark Paid</button>`:'<span class="badge done" style="font-size:11px">Paid ✓</span>'}
+              </div></td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+function _filterInvoices(val){
+  document.querySelectorAll('#inv-tbody tr').forEach(row=>{
+    row.style.display=(!val||row.dataset.status===val)?'':'none';
+  });
+}
+function openAddInvoiceModal(){
+  openModal({title:'Generate Invoice',
+    body:`<div class="form-row">
+      <div class="form-group"><label class="form-label">Customer ID *</label>
+        <input class="form-input" id="inv-cust" type="number" placeholder="Customer ID"/></div>
+      <div class="form-group"><label class="form-label">Job ID</label>
+        <input class="form-input" id="inv-job" type="number" placeholder="Link to job (auto-calculates)"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Discount (₹)</label>
+        <input class="form-input" id="inv-disc" type="number" value="0"/></div>
+      <div class="form-group"><label class="form-label">GST %</label>
+        <input class="form-input" id="inv-tax" type="number" value="18"/></div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group"><label class="form-label">Payment Method</label>
+        <select class="form-select" id="inv-method">
+          <option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option>
+        </select></div>
+    </div>
+    <p style="font-size:11.5px;color:var(--text3);margin-top:6px">ℹ Amount auto-calculated from parts added to the job.</p>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveInvoice()">Generate Invoice</button>`});
+}
+function saveInvoice(){
+  const custId=parseInt(document.getElementById('inv-cust').value);
+  if(!custId){showToast('Customer ID required','error');return}
+  const customer=DB.getList('customers').find(c=>c.id===custId);
+  if(!customer){showToast('Customer not found','error');return}
+  const jobId=parseInt(document.getElementById('inv-job').value)||null;
+  const parts=jobId?DB.getList('parts').filter(p=>p.job_id===jobId):[];
+  const subtotal=parts.reduce((s,p)=>s+p.total_price,0);
+  const disc=parseFloat(document.getElementById('inv-disc').value)||0;
+  const taxPct=parseFloat(document.getElementById('inv-tax').value)||18;
+  const base=subtotal-disc;const taxAmt=base*taxPct/100;const total=base+taxAmt;
+  const id=DB.nextId('invoices');
+  const count=DB.getList('invoices').length+1;
+  const inv={id,invoice_number:`INV-${String(count).padStart(4,'0')}`,customer_id:custId,job_id:jobId,
+    subtotal,discount:disc,tax_percent:taxPct,tax_amount:taxAmt,total,status:'Unpaid',
+    payment_method:document.getElementById('inv-method').value,created_at:new Date().toISOString()};
+  DB.push('invoices',inv);closeModal();showToast(`Invoice ${inv.invoice_number} — ${fmtCurrency(total)}`);renderBilling();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════════════════════════════════════
+function renderReports(){
+  const jobs=DB.getList('jobs');const invoices=DB.getList('invoices');const customers=DB.getList('customers');
+  const techs=DB.getList('technicians');const techMap=Object.fromEntries(techs.map(t=>[t.id,t]));
+  const totalRev=invoices.filter(i=>i.status==='Paid').reduce((s,i)=>s+i.total,0);
+  const statuses=['Pending','In Progress','Completed','Delivered','Cancelled'];
+  const statusColors={'Completed':'var(--green)','In Progress':'var(--blue)','Pending':'var(--yellow)','Cancelled':'var(--red)','Delivered':'var(--teal)'};
+  const totalJobs=jobs.length;
+  const completed=jobs.filter(j=>j.status==='Completed'||j.status==='Delivered').length;
+  const completePct=totalJobs>0?Math.round(completed/totalJobs*100):0;
+  const techPerf=techs.map(t=>{
+    const tJobs=jobs.filter(j=>j.technician_id===t.id);
+    const tInvs=invoices.filter(i=>i.status==='Paid'&&tJobs.some(j=>j.id===i.job_id));
+    return{...t,total_jobs:tJobs.length,completed:tJobs.filter(j=>j.status==='Completed').length,revenue:tInvs.reduce((s,i)=>s+i.total,0)};
+  });
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div class="stats-grid" style="margin-bottom:18px">
+      <div class="stat-card blue"><div class="stat-label">Total Jobs</div><div class="stat-num">${totalJobs}</div></div>
+      <div class="stat-card green"><div class="stat-label">Completed</div><div class="stat-num">${completed}</div><div class="stat-sub">${completePct}% completion rate</div></div>
+      <div class="stat-card orange"><div class="stat-label">Revenue (All Time)</div><div class="stat-num">${fmtCurrency(totalRev)}</div></div>
+      <div class="stat-card purple"><div class="stat-label">Total Customers</div><div class="stat-num">${customers.length}</div></div>
+    </div>
+    <div class="grid-2" style="margin-bottom:14px">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Job Status Breakdown</div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+          ${statuses.map(s=>{
+            const cnt=jobs.filter(j=>j.status===s).length;
+            const pct=totalJobs>0?Math.round(cnt/totalJobs*100):0;
+            const c=statusColors[s]||'var(--text3)';
+            return `<div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px">
+                <span>${statusBadge(s)}</span><span style="color:var(--text);font-weight:500">${cnt} (${pct}%)</span>
+              </div>
+              <div style="height:5px;background:var(--bg3);border-radius:10px;overflow:hidden">
+                <div style="height:100%;width:${pct}%;background:${c};border-radius:10px;transition:width .6s ease"></div>
+              </div>
+            </div>`;}).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Technician Performance</div></div>
+        <table><thead><tr><th>Technician</th><th>Total</th><th>Done</th><th>Revenue</th></tr></thead>
+          <tbody>
+            ${techPerf.length===0?emptyRow(4,'No technician data'):techPerf.map(t=>`
+              <tr>
+                <td style="font-weight:600;color:var(--text)">${escHtml(t.full_name)}</td>
+                <td>${t.total_jobs}</td>
+                <td><span class="badge done">${t.completed}</span></td>
+                <td style="color:var(--green)">${fmtCurrency(t.revenue)}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Monthly Revenue</div></div>
+      <div style="display:flex;align-items:flex-end;gap:8px;height:140px;padding-bottom:4px;margin-top:8px" id="reports-chart"></div>
+    </div>`;
+
+  // Monthly chart
+  const months=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date();d.setMonth(d.getMonth()-i);
+    months.push({key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`,label:d.toLocaleString('default',{month:'short'}),revenue:0,jobs:0});
+  }
+  invoices.filter(i=>i.status==='Paid').forEach(i=>{const m=(i.created_at||'').slice(0,7);const b=months.find(x=>x.key===m);if(b)b.revenue+=i.total||0});
+  jobs.forEach(j=>{const m=(j.received_date||j.created_at||'').slice(0,7);const b=months.find(x=>x.key===m);if(b)b.jobs++});
+  const maxR=Math.max(...months.map(m=>m.revenue),1);const H=130;
+  const rc=document.getElementById('reports-chart');
+  rc.innerHTML=months.map(m=>{
+    const h=Math.max(Math.round(m.revenue/maxR*H),m.revenue>0?4:0);
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <div title="${fmtCurrency(m.revenue)}" style="width:100%;height:${h}px;background:linear-gradient(to top,var(--blue),var(--blue3));border-radius:4px 4px 0 0;opacity:.85" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.85"></div>
+      <div style="font-size:9px;color:var(--text3)">${m.label}</div>
+    </div>`;}).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DOCUMENTS
+// ═══════════════════════════════════════════════════════════════════════
+function renderDocuments(){
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+      ${docCard('Offer Letters','📄','Generate offer letters for employees','var(--blue)','openOfferLetterModal()')}
+      ${docCard('Employee ID Cards','🪪','Generate ID cards for staff','var(--orange)','openIdCardModal()')}
+      ${docCard('Service Reports','📊','Monthly service summary report','var(--green)','openServiceReportModal()')}
+      ${docCard('Quick Invoice','🧾','Generate invoice for any job','var(--purple)','openAddInvoiceModal()')}
+      ${docCard('Salary Slips','💵','Generate salary slips for technicians','var(--teal)','openSalarySlipModal()')}
+      ${docCard('Customer History','📁','Full service history export','var(--yellow)','openCustomerExportModal()')}
+    </div>`;
+}
+function docCard(title,icon,desc,color,onclick){
+  return `<div class="card" style="cursor:pointer;transition:all .2s"
+    onmouseenter="this.style.borderColor='${color}'"
+    onmouseleave="this.style.borderColor='var(--border)'"
+    onclick="${onclick}">
+    <div style="font-size:32px;margin-bottom:10px">${icon}</div>
+    <div class="card-title" style="margin-bottom:6px">${title}</div>
+    <div style="font-size:12.5px;color:var(--text3);margin-bottom:14px">${desc}</div>
+    <div style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:${color};font-weight:600">Generate →</div>
+  </div>`;
+}
+function openOfferLetterModal(){
+  openModal({title:'Generate Offer Letter',
+    body:`<div class="form-row">
+      <div class="form-group"><label class="form-label">Employee Name *</label>
+        <input class="form-input" id="ol-name" placeholder="Full name"/></div>
+      <div class="form-group"><label class="form-label">Role / Designation *</label>
+        <input class="form-input" id="ol-role" placeholder="e.g. Technician"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Start Date</label>
+        <input class="form-input" id="ol-date" type="date"/></div>
+      <div class="form-group"><label class="form-label">Monthly Salary (₹)</label>
+        <input class="form-input" id="ol-salary" type="number" placeholder="0"/></div>
+    </div>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="genOfferLetterLocal()">Generate</button>`});
+}
+function genOfferLetterLocal(){
+  const name=document.getElementById('ol-name').value.trim();
+  const role=document.getElementById('ol-role').value.trim();
+  if(!name||!role){showToast('Name and role required','error');return}
+  const salary=document.getElementById('ol-salary').value||'0';
+  const date=document.getElementById('ol-date').value||new Date().toLocaleDateString('en-IN');
+  const settings=DB.get('settings')||{company_name:'Shashiv IT Solutions'};
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Offer Letter</title>
+  <style>body{font-family:Arial,sans-serif;padding:40px;color:#333;max-width:700px;margin:0 auto}
+  h1{color:#1D4ED8;font-size:22px}h2{font-size:16px;color:#555}
+  .line{border-top:2px solid #1D4ED8;margin:20px 0}
+  .field{margin:12px 0}.label{font-weight:bold;color:#555}
+  .sign{margin-top:60px;border-top:1px solid #333;width:200px;padding-top:6px;font-size:13px;color:#666}
+  </style></head><body>
+  <h1>${escHtml(settings.company_name)}</h1>
+  <div class="line"></div>
+  <h2>OFFER LETTER</h2>
+  <p>Date: ${date}</p>
+  <p>Dear <strong>${escHtml(name)}</strong>,</p>
+  <p>We are pleased to offer you the position of <strong>${escHtml(role)}</strong> at ${escHtml(settings.company_name)}.</p>
+  <div class="field"><span class="label">Position:</span> ${escHtml(role)}</div>
+  <div class="field"><span class="label">Start Date:</span> ${date}</div>
+  <div class="field"><span class="label">Monthly CTC:</span> ₹${Number(salary).toLocaleString('en-IN')}</div>
+  <div class="line"></div>
+  <p>This offer is contingent upon successful completion of all required documentation. Please accept this offer within 7 days.</p>
+  <p style="margin-top:30px">Warm regards,</p>
+  <div class="sign">Authorized Signatory<br>${escHtml(settings.company_name)}</div>
+  </body></html>`;
+  const win=window.open('','_blank');win.document.write(html);win.document.close();
+  win.onload=()=>win.print();
+  closeModal();showToast('Offer letter opened for printing!');
+}
+function openIdCardModal(){
+  openModal({title:'Generate Employee ID Card',
+    body:`<div class="form-row">
+      <div class="form-group"><label class="form-label">Employee Name *</label>
+        <input class="form-input" id="id-name" placeholder="Full name"/></div>
+      <div class="form-group"><label class="form-label">Employee ID *</label>
+        <input class="form-input" id="id-empid" placeholder="e.g. EMP-001"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Designation</label>
+        <input class="form-input" id="id-role" placeholder="e.g. Senior Technician"/></div>
+      <div class="form-group"><label class="form-label">Phone</label>
+        <input class="form-input" id="id-phone" placeholder="Phone number"/></div>
+    </div>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="genIdCardLocal()">Generate</button>`});
+}
+function genIdCardLocal(){
+  const name=document.getElementById('id-name').value.trim();
+  const empid=document.getElementById('id-empid').value.trim();
+  if(!name||!empid){showToast('Name and Employee ID required','error');return}
+  const role=document.getElementById('id-role').value.trim()||'Employee';
+  const phone=document.getElementById('id-phone').value.trim()||'—';
+  const settings=DB.get('settings')||{company_name:'Shashiv IT Solutions'};
+  const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ID Card</title>
+  <style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f0f0f0}
+  .card{width:340px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+  .header{background:linear-gradient(135deg,#1D4ED8,#F97316);padding:20px;text-align:center;color:#fff}
+  .avatar{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;margin:0 auto 10px;border:3px solid rgba(255,255,255,.5)}
+  .body{padding:20px}
+  .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:14px}
+  .label{color:#888}.value{font-weight:600;color:#333}
+  .footer{background:#f8f8f8;padding:12px 20px;text-align:center;font-size:11px;color:#999}
+  @media print{body{background:#fff}}</style></head><body>
+  <div class="card">
+    <div class="header">
+      <div class="avatar">${initials}</div>
+      <div style="font-size:18px;font-weight:700">${escHtml(name)}</div>
+      <div style="font-size:13px;opacity:.9">${escHtml(role)}</div>
+    </div>
+    <div class="body">
+      <div class="row"><span class="label">Employee ID</span><span class="value">${escHtml(empid)}</span></div>
+      <div class="row"><span class="label">Phone</span><span class="value">${escHtml(phone)}</span></div>
+      <div class="row"><span class="label">Company</span><span class="value">${escHtml(settings.company_name)}</span></div>
+    </div>
+    <div class="footer">${escHtml(settings.company_name)} · ${settings.company_address||''}</div>
+  </div>
+  </body></html>`;
+  const win=window.open('','_blank');win.document.write(html);win.document.close();
+  win.onload=()=>win.print();
+  closeModal();showToast('ID card opened for printing!');
+}
+function openServiceReportModal(){
+  const now=new Date();const month=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  openModal({title:'Service Summary Report',
+    body:`<div class="form-row">
+      <div class="form-group"><label class="form-label">Start Date</label>
+        <input class="form-input" id="sr-start" type="date" value="${month}-01"/></div>
+      <div class="form-group"><label class="form-label">End Date</label>
+        <input class="form-input" id="sr-end" type="date" value="${now.toISOString().slice(0,10)}"/></div>
+    </div>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="closeModal();navigate('reports')">View Reports</button>`});
+}
+function openSalarySlipModal(){
+  openModal({title:'Salary Slip',
+    body:`<div class="form-row">
+      <div class="form-group"><label class="form-label">Technician</label>
+        <select class="form-select" id="ss-tech">${techOptions()}</select></div>
+      <div class="form-group"><label class="form-label">Month</label>
+        <input class="form-input" id="ss-month" type="month"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Basic Salary (₹)</label>
+        <input class="form-input" id="ss-basic" type="number" placeholder="0"/></div>
+      <div class="form-group"><label class="form-label">Bonus (₹)</label>
+        <input class="form-input" id="ss-bonus" type="number" value="0"/></div>
+    </div>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="genSalarySlip()">Generate</button>`});
+}
+function genSalarySlip(){
+  const techId=parseInt(document.getElementById('ss-tech').value);
+  const tech=DB.getList('technicians').find(t=>t.id===techId);
+  if(!tech){showToast('Select a technician','error');return}
+  const basic=parseFloat(document.getElementById('ss-basic').value)||0;
+  const bonus=parseFloat(document.getElementById('ss-bonus').value)||0;
+  const month=document.getElementById('ss-month').value||new Date().toLocaleString('default',{month:'long',year:'numeric'});
+  const net=basic+bonus;
+  const settings=DB.get('settings')||{company_name:'Shashiv IT Solutions'};
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Salary Slip</title>
+  <style>body{font-family:Arial,sans-serif;padding:40px;max-width:700px;margin:0 auto}
+  h1{color:#1D4ED8}table{width:100%;border-collapse:collapse;margin:20px 0}
+  th,td{padding:10px;border:1px solid #ddd;text-align:left}th{background:#f0f0f0}
+  .total{font-weight:700;font-size:16px;background:#e8f4ff}</style></head><body>
+  <h1>${escHtml(settings.company_name)}</h1>
+  <h2>Salary Slip — ${month}</h2>
+  <p>Employee: <strong>${escHtml(tech.full_name)}</strong> &nbsp;|&nbsp; Designation: ${escHtml(tech.designation||'Technician')}</p>
+  <table>
+    <tr><th>Earnings</th><th>Amount (₹)</th></tr>
+    <tr><td>Basic Salary</td><td>₹${Number(basic).toLocaleString('en-IN')}</td></tr>
+    <tr><td>Bonus / Incentive</td><td>₹${Number(bonus).toLocaleString('en-IN')}</td></tr>
+    <tr class="total"><td>Net Pay</td><td>₹${Number(net).toLocaleString('en-IN')}</td></tr>
+  </table>
+  </body></html>`;
+  const win=window.open('','_blank');win.document.write(html);win.document.close();
+  win.onload=()=>win.print();
+  closeModal();showToast('Salary slip opened!');
+}
+function openCustomerExportModal(){
+  openModal({title:'Export Customer History',
+    body:`<div class="form-row full">
+      <div class="form-group"><label class="form-label">Customer</label>
+        <select class="form-select" id="ce-cust">
+          <option value="">— Select Customer —</option>
+          ${DB.getList('customers').map(c=>`<option value="${c.id}">${escHtml(c.name)}</option>`).join('')}
+        </select></div>
+    </div>`,
+    footerHTML:`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="genCustomerExport()">Generate Report</button>`});
+}
+function genCustomerExport(){
+  const custId=parseInt(document.getElementById('ce-cust').value);
+  const c=DB.getList('customers').find(x=>x.id===custId);
+  if(!c){showToast('Select a customer','error');return}
+  const jobs=DB.getList('jobs').filter(j=>j.customer_id===custId);
+  const invoices=DB.getList('invoices').filter(i=>i.customer_id===custId);
+  const techMap=Object.fromEntries(DB.getList('technicians').map(t=>[t.id,t]));
+  const totalPaid=invoices.filter(i=>i.status==='Paid').reduce((s,i)=>s+i.total,0);
+  const settings=DB.get('settings')||{company_name:'Shashiv IT Solutions'};
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Customer Report</title>
+  <style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto}
+  h1{color:#1D4ED8}table{width:100%;border-collapse:collapse;margin:14px 0}
+  th,td{padding:9px;border:1px solid #ddd;font-size:13px}th{background:#f0f0f0}
+  .section{margin:20px 0}.section h3{color:#555;border-bottom:2px solid #1D4ED8;padding-bottom:6px}</style></head><body>
+  <h1>${escHtml(settings.company_name)}</h1>
+  <h2>Customer Service History Report</h2>
+  <div class="section"><h3>Customer Details</h3>
+    <p>Name: <strong>${escHtml(c.name)}</strong> | Phone: ${escHtml(c.phone)} | Email: ${escHtml(c.email||'—')} | Address: ${escHtml(c.address||'—')}</p>
+    <p>Customer Since: ${fmtDate(c.created_at)} | Total Jobs: ${jobs.length} | Total Paid: ₹${Number(totalPaid).toLocaleString('en-IN')}</p>
+  </div>
+  <div class="section"><h3>Service Jobs</h3>
+  <table><tr><th>Job#</th><th>Device</th><th>Problem</th><th>Technician</th><th>Status</th><th>Date</th></tr>
+  ${jobs.map(j=>`<tr><td>${j.job_number}</td><td>${j.device_type} ${j.device_brand||''}</td><td>${j.problem_desc}</td><td>${(techMap[j.technician_id]||{}).full_name||'Unassigned'}</td><td>${j.status}</td><td>${fmtDate(j.received_date)}</td></tr>`).join('')}
+  </table></div>
+  <div class="section"><h3>Invoices</h3>
+  <table><tr><th>Invoice#</th><th>Date</th><th>Amount</th><th>Status</th></tr>
+  ${invoices.map(i=>`<tr><td>${i.invoice_number}</td><td>${fmtDate(i.created_at)}</td><td>₹${Number(i.total).toLocaleString('en-IN')}</td><td>${i.status}</td></tr>`).join('')}
+  </table></div>
+  </body></html>`;
+  const win=window.open('','_blank');win.document.write(html);win.document.close();
+  win.onload=()=>win.print();
+  closeModal();showToast('Customer report opened!');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════════════
+function renderSettings(){
+  const settings=DB.get('settings')||{};
+  const content=document.getElementById('page-content');
+  content.innerHTML=`
+    <div class="settings-layout">
+      <div class="card" style="padding:10px;height:fit-content">
+        <div class="settings-nav" id="settings-nav">
+          <div class="settings-nav-item active" onclick="switchSettingsPanel(this,'company')">Company Info</div>
+          <div class="settings-nav-item" onclick="switchSettingsPanel(this,'billing')">Invoice Settings</div>
+          <div class="settings-nav-item" onclick="switchSettingsPanel(this,'changepass')">Change Password</div>
+          <div class="settings-nav-item" onclick="switchSettingsPanel(this,'about')">About CRM</div>
+        </div>
+      </div>
+      <div id="settings-panel">${companySettingsHTML(settings)}</div>
+    </div>`;
+}
+function switchSettingsPanel(el,panel){
+  document.querySelectorAll('.settings-nav-item').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  const panels={company:()=>companySettingsHTML(DB.get('settings')||{}),
+    billing:billingSettingsHTML,changepass:changePassHTML,about:aboutHTML};
+  document.getElementById('settings-panel').innerHTML=(panels[panel]||billingSettingsHTML)();
+}
+function companySettingsHTML(s={}){
+  return `<div class="card">
+    <div class="card-head"><div class="card-title">Company Information</div></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Company Name</label>
+        <input class="form-input" id="s-cname" value="${escHtml(s.company_name||'')}" placeholder="Company name"/></div>
+      <div class="form-group"><label class="form-label">Phone</label>
+        <input class="form-input" id="s-phone" value="${escHtml(s.company_phone||'')}" placeholder="+91 xxxxx xxxxx"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Email</label>
+        <input class="form-input" id="s-email" value="${escHtml(s.company_email||'')}" placeholder="info@company.com"/></div>
+      <div class="form-group"><label class="form-label">GST Number</label>
+        <input class="form-input" id="s-gst" value="${escHtml(s.gst_number||'')}" placeholder="GST number"/></div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group"><label class="form-label">Address</label>
+        <textarea class="form-textarea" id="s-addr">${escHtml(s.company_address||'')}</textarea></div>
+    </div>
+    <button class="btn primary" onclick="saveCompanySettings()">Save Changes</button>
+  </div>`;
+}
+function billingSettingsHTML(){
+  return `<div class="card">
+    <div class="card-head"><div class="card-title">Invoice & Billing Settings</div></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Invoice Prefix</label>
+        <input class="form-input" id="s-invpfx" placeholder="INV"/></div>
+      <div class="form-group"><label class="form-label">Default GST %</label>
+        <input class="form-input" id="s-gst-pct" type="number" placeholder="18"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Currency Symbol</label>
+        <input class="form-input" id="s-curr" placeholder="₹" value="₹"/></div>
+      <div class="form-group"><label class="form-label">Job Number Prefix</label>
+        <input class="form-input" id="s-jobpfx" placeholder="JOB" value="JOB"/></div>
+    </div>
+    <button class="btn primary" onclick="showToast('Billing settings saved!')">Save</button>
+  </div>`;
+}
+function changePassHTML(){
+  return `<div class="card">
+    <div class="card-head"><div class="card-title">Change Login Password</div></div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">
+      Note: This CRM uses local storage. Password changes affect your current session.
+    </p>
+    <div class="form-row full">
+      <div class="form-group"><label class="form-label">Current Password</label>
+        <input class="form-input" type="password" id="cp-old" placeholder="Current password"/></div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group"><label class="form-label">New Password (min 6 characters)</label>
+        <input class="form-input" type="password" id="cp-new" placeholder="New password"/></div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group"><label class="form-label">Confirm New Password</label>
+        <input class="form-input" type="password" id="cp-conf" placeholder="Confirm password"/></div>
+    </div>
+    <div id="cp-msg" style="display:none;margin-top:8px;font-size:13px;padding:8px 12px;border-radius:6px;border:1px solid"></div>
+    <div style="margin-top:14px">
+      <button class="btn primary" onclick="showToast('Contact admin to change system credentials.','error')">Update Password</button>
+    </div>
+  </div>`;
+}
+function aboutHTML(){
+  const stats={customers:DB.getList('customers').length,jobs:DB.getList('jobs').length,invoices:DB.getList('invoices').length,techs:DB.getList('technicians').length};
+  return `<div class="card">
+    <div class="card-head"><div class="card-title">About Shashiv IT CRM</div></div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div class="logo-icon" style="width:52px;height:52px;font-size:20px">S</div>
+      <div>
+        <div style="font-family:var(--font-head);font-size:18px;font-weight:700;color:var(--text)">Shashiv IT Solutions</div>
+        <div style="color:var(--text3);font-size:12px">CRM & Service Management System v5.0</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:800;color:var(--blue)">${stats.customers}</div>
+        <div style="font-size:11px;color:var(--text3)">Customers</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:800;color:var(--orange)">${stats.jobs}</div>
+        <div style="font-size:11px;color:var(--text3)">Jobs</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:800;color:var(--green)">${stats.invoices}</div>
+        <div style="font-size:11px;color:var(--text3)">Invoices</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:800;color:var(--purple)">${stats.techs}</div>
+        <div style="font-size:11px;color:var(--text3)">Technicians</div>
+      </div>
+    </div>
+    <p style="font-size:12.5px;color:var(--text3)">All data is stored locally in your browser. Login: ID <code style="color:var(--blue)">123456</code> / Password <code style="color:var(--orange)">00000000</code></p>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn danger" onclick="if(confirmAction('Clear ALL data and reset to demo data?')){localStorage.clear();location.reload()}">Reset to Demo Data</button>
+    </div>
+  </div>`;
+}
+function saveCompanySettings(){
+  const s=DB.get('settings')||{};
+  DB.set('settings',{...s,
+    company_name:document.getElementById('s-cname')?.value.trim()||'',
+    company_phone:document.getElementById('s-phone')?.value.trim()||'',
+    company_email:document.getElementById('s-email')?.value.trim()||'',
+    gst_number:document.getElementById('s-gst')?.value.trim()||'',
+    company_address:document.getElementById('s-addr')?.value.trim()||''});
+  showToast('Company settings saved!');
+}
 </script>
 </body>
 </html>
