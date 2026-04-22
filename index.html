@@ -496,20 +496,53 @@ td{padding:11px 12px;color:var(--text2);vertical-align:middle}
   <div class="spinner"></div>
 </div>
 
-<script>
-// ═══════════════════════════════════════════════════════════════════════
-// DATA STORE — localStorage-backed
-// ═══════════════════════════════════════════════════════════════════════
-const DB = {
-  get(key){try{return JSON.parse(localStorage.getItem('crm_'+key)||'null')}catch{return null}},
-  set(key,val){localStorage.setItem('crm_'+key,JSON.stringify(val))},
-  getList(key){return this.get(key)||[]},
-  push(key,item){const l=this.getList(key);l.push(item);this.set(key,l)},
-  update(key,id,updates){const l=this.getList(key);const i=l.findIndex(x=>x.id===id);if(i>=0){l[i]={...l[i],...updates};this.set(key,l);return l[i]}return null},
-  remove(key,id){const l=this.getList(key).filter(x=>x.id!==id);this.set(key,l)},
-  nextId(key){const l=this.getList(key);return l.length>0?Math.max(...l.map(x=>x.id))+1:1},
-};
+<script type="module">
+  // 1. Import Firebase from the Web CDN
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, set, onValue, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+  // 2. Your specific Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCmlp8tIIfwPV_os8gUPFfYpxEDSW_cGCM",
+    authDomain: "mycrm-f0774.firebaseapp.com",
+    databaseURL: "https://mycrm-f0774-default-rtdb.firebaseio.com",
+    projectId: "mycrm-f0774",
+    storageBucket: "mycrm-f0774.firebasestorage.app",
+    messagingSenderId: "776907629542",
+    appId: "1:776907629542:web:cd04fe82e5e7b89066ac27",
+    measurementId: "G-YVH2SGHT1E"
+  };
+
+  // 3. Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  // 4. Override the DB object to use Firebase instead of LocalStorage
+  window.DB = {
+    get: async (key) => {
+      try {
+        const dbRef = ref(database);
+        const snapshot = await get(child(dbRef, `crm_data/${key}`));
+        return snapshot.exists() ? snapshot.val() : null;
+      } catch (e) {
+        console.error("Error fetching data:", e);
+        return JSON.parse(localStorage.getItem('crm_v1_' + key));
+      }
+    },
+    set: (key, val) => {
+      // Save to Cloud
+      set(ref(database, `crm_data/${key}`), val);
+      // Also save to LocalStorage as a backup
+      localStorage.setItem('crm_v1_' + key, JSON.stringify(val));
+    }
+  };
+
+  // --- START OF YOUR ORIGINAL CRM LOGIC ---
+  // Note: I am keeping your existing logic but it will now use the new 'DB' object above.
+  
+  // (Paste the rest of your original functions here: App, Auth, UI, etc.)
+  // Ensure you keep your existing 'const App = {...}' and 'const Auth = {...}' logic!
+</script>
 // ── Seed default data if empty ──────────────────────────────────────────
 function seedIfEmpty(){
   if(DB.getList('customers').length===0){
