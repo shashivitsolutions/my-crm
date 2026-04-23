@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet"/>
 
-<!-- Firebase SDK (CDN — no build step needed) -->
 <script type="module">
 // ═══════════════════════════════════════════════════
 // FIREBASE SETUP
@@ -20,166 +19,94 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, creat
                                    from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey:            "AIzaSyCmlp8tIIfwPV_os8gUPFfYpxEDSW_cGCM",
-  authDomain:        "mycrm-f0774.firebaseapp.com",
-  databaseURL:       "https://mycrm-f0774-default-rtdb.firebaseio.com",
-  projectId:         "mycrm-f0774",
-  storageBucket:     "mycrm-f0774.firebasestorage.app",
-  messagingSenderId: "776907629542",
-  appId:             "1:776907629542:web:cd04fe82e5e7b89066ac27",
-  measurementId:     "G-YVH2SGHT1E"
+  apiKey:             "AIzaSyCmlp8tIIfwPV_os8gUPFfYpxEDSW_cGCM",
+  authDomain:         "mycrm-f0774.firebaseapp.com",
+  databaseURL:        "https://mycrm-f0774-default-rtdb.firebaseio.com",
+  projectId:          "mycrm-f0774",
+  storageBucket:      "mycrm-f0774.firebasestorage.app",
+  messagingSenderId:  "776907629542",
+  appId:              "1:776907629542:web:cd04fe82e5e7b89066ac27",
+  measurementId:      "G-YVH2SGHT1E"
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db          = getDatabase(firebaseApp);
 const auth        = getAuth(firebaseApp);
 
-// ── Hard-coded CRM login (Employee ID / Password) ─────────────────────
-// These are separate from Firebase Auth — we use Firebase Auth behind
-// the scenes just to protect the database, but show a simple ID/password
-// UI to the user.
+// CRM Login Credentials
 const CRM_ID   = "123456";
 const CRM_PASS = "00000000";
-// Firebase Auth email used as a "service account" to unlock the DB:
-const FB_EMAIL = "admin@shashivit.crm";  // created automatically on first login
+const FB_EMAIL = "admin@shashivit.crm";
 const FB_PASS  = "Shashiv@CRM2025!";
 
 // ═══════════════════════════════════════════════════
-// FIREBASE HELPERS
+// FIREBASE HELPERS (The Bridge)
 // ═══════════════════════════════════════════════════
 window.FB = {
-  // Read all records from a path → returns array
   async getList(path) {
-    const snap = await get(ref(db, path));
+    const snap = await get(ref(db, 'crm_data/' + path));
     if (!snap.exists()) return [];
     const val = snap.val();
     return Object.entries(val).map(([k, v]) => ({ ...v, _key: k }));
   },
-  // Read single object
   async getOne(path) {
-    const snap = await get(ref(db, path));
+    const snap = await get(ref(db, 'crm_data/' + path));
     return snap.exists() ? snap.val() : null;
   },
-  // Push new record → returns firebase key
   async push(path, data) {
-    const r = await push(ref(db, path), data);
+    const r = await push(ref(db, 'crm_data/' + path), data);
     return r.key;
   },
-  // Set / overwrite
   async set(path, data) {
-    await set(ref(db, path), data);
+    await set(ref(db, 'crm_data/' + path), data);
   },
-  // Update fields
   async update(path, data) {
-    await update(ref(db, path), data);
+    await update(ref(db, 'crm_data/' + path), data);
   },
-  // Delete
   async remove(path) {
-    await remove(ref(db, path));
+    await remove(ref(db, 'crm_data/' + path));
   },
-  // Next numeric ID based on count
-  async nextId(path) {
-    const items = await this.getList(path);
-    return items.length > 0 ? Math.max(...items.map(x => x.id || 0)) + 1 : 1;
-  },
+  onValue(path, callback) {
+    return onValue(ref(db, 'crm_data/' + path), (snapshot) => {
+      callback(snapshot.val());
+    });
+  }
 };
 
 // ═══════════════════════════════════════════════════
-// SEED DEMO DATA (only if database is empty)
-// ═══════════════════════════════════════════════════
-async function seedIfEmpty() {
-  const snap = await get(ref(db, 'seeded'));
-  if (snap.exists()) return; // already seeded
-
-  const now = new Date().toISOString();
-  const batch = {};
-
-  batch['settings'] = {
-    company_name: 'Shashiv IT Solutions',
-    company_phone: '+91 98765 43210',
-    company_email: 'info@shashivit.com',
-    company_address: 'Shop No. 5, Near Railway Station, Virar West, Mumbai - 401303',
-    gst_number: '27AABCS1429B1ZB',
-  };
-
-  batch['technicians/tech1'] = { id: 1, full_name: 'Vijay Salvi',   phone: '9123456780', email: 'vijay@shashivit.com', designation: 'Senior Technician', status: 'Active', created_at: now };
-  batch['technicians/tech2'] = { id: 2, full_name: 'Ravi Desai',    phone: '9234567801', email: 'ravi@shashivit.com',  designation: 'Technician',         status: 'Active', created_at: now };
-
-  batch['customers/cust1'] = { id: 1, name: 'Rahul Sharma', phone: '9876543210', email: 'rahul@email.com', address: 'Virar, Mumbai',    created_at: now };
-  batch['customers/cust2'] = { id: 2, name: 'Priya Patel',  phone: '8765432109', email: 'priya@email.com', address: 'Bandra, Mumbai',   created_at: now };
-  batch['customers/cust3'] = { id: 3, name: 'Amit Kumar',   phone: '7654321098', email: 'amit@email.com',  address: 'Pune, Maharashtra',created_at: now };
-
-  batch['jobs/job1'] = { id:1, job_number:'JOB-0001', customer_id:1, technician_id:1, device_type:'HP Laptop',     device_brand:'HP',      problem_desc:'Screen flickering, battery not charging', status:'In Progress', priority:'Urgent', estimated_cost:2500, received_date:now, created_at:now };
-  batch['jobs/job2'] = { id:2, job_number:'JOB-0002', customer_id:2, technician_id:2, device_type:'Samsung Phone', device_brand:'Samsung', problem_desc:'Touch not working after water damage',     status:'Pending',     priority:'Normal', estimated_cost:1800, received_date:now, created_at:now };
-  batch['jobs/job3'] = { id:3, job_number:'JOB-0003', customer_id:3, technician_id:1, device_type:'Dell Desktop',  device_brand:'Dell',    problem_desc:'Not booting, HDD failure',                status:'Completed',   priority:'Low',    estimated_cost:3200, received_date:now, completed_date:now, created_at:now };
-
-  batch['parts/p1'] = { id:1, job_id:1, item_name:'New Battery',          quantity:1, unit_price:1200, total_price:1200 };
-  batch['parts/p2'] = { id:2, job_id:1, item_name:'Screen cleaning',       quantity:1, unit_price:500,  total_price:500  };
-  batch['parts/p3'] = { id:3, job_id:3, item_name:'WD HDD 1TB',           quantity:1, unit_price:2800, total_price:2800 };
-  batch['parts/p4'] = { id:4, job_id:3, item_name:'OS Installation',       quantity:1, unit_price:400,  total_price:400  };
-
-  batch['invoices/inv1'] = { id:1, invoice_number:'INV-0001', customer_id:3, job_id:3, subtotal:3200, discount:0, tax_percent:18, tax_amount:576, total:3776, status:'Paid', payment_method:'Cash', created_at:now };
-
-  batch['enquiries/enq1'] = { id:1, caller_name:'Suresh Nair',  phone:'9012345678', call_reason:'Laptop screen broken',  converted:false, logged_at:now };
-  batch['enquiries/enq2'] = { id:2, caller_name:'Meena Joshi',  phone:'8901234567', call_reason:'Phone not charging',    converted:true,  logged_at:now };
-
-  batch['seeded'] = true;
-
-  await update(ref(db), batch);
-  console.log('[CRM] Demo data seeded to Firebase ✓');
-}
-
-// ═══════════════════════════════════════════════════
-// FIREBASE AUTH — sign in silently, handle first-time
+// AUTH & INITIALIZATION
 // ═══════════════════════════════════════════════════
 async function ensureFirebaseAuth() {
-  return new Promise((resolve, reject) => {
-    signInWithEmailAndPassword(auth, FB_EMAIL, FB_PASS)
-      .then(resolve)
-      .catch(async (err) => {
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-email') {
-          // First time — create the service account
-          try {
-            await createUserWithEmailAndPassword(auth, FB_EMAIL, FB_PASS);
-            resolve();
-          } catch (e2) {
-            // might already exist under different error
-            reject(e2);
-          }
-        } else {
-          reject(err);
-        }
-      });
-  });
+  try {
+    await signInWithEmailAndPassword(auth, FB_EMAIL, FB_PASS);
+  } catch (err) {
+    if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+      await createUserWithEmailAndPassword(auth, FB_EMAIL, FB_PASS);
+    }
+  }
 }
 
-// ═══════════════════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════════════════
 window._fbReady = false;
 window._fbReadyCallbacks = [];
-window.onFBReady = (fn) => {
-  if (window._fbReady) fn(); else window._fbReadyCallbacks.push(fn);
-};
+window.onFBReady = (fn) => { if (window._fbReady) fn(); else window._fbReadyCallbacks.push(fn); };
 
 (async () => {
   try {
     await ensureFirebaseAuth();
-    await seedIfEmpty();
     window._fbReady = true;
     window._fbReadyCallbacks.forEach(fn => fn());
-    console.log('[CRM] Firebase connected ✓');
+    console.log('[CRM] Cloud Connected');
   } catch (e) {
     console.error('[CRM] Firebase error:', e);
-    document.getElementById('fb-error').textContent =
-      '⚠ Firebase connection failed: ' + (e.message || e.code || e);
-    document.getElementById('fb-error').style.display = 'block';
+    const errEl = document.getElementById('fb-error');
+    if(errEl) {
+      errEl.textContent = '⚠ Connection failed: ' + (e.message || e.code);
+      errEl.style.display = 'block';
+    }
   }
 })();
 
-// Expose auth signOut for logout
 window._fbSignOut = () => signOut(auth);
-
 </script>
 
 <style>
@@ -210,7 +137,7 @@ input,select,textarea{font-family:var(--font)}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
 
-/* ── SPLASH / CONNECTING SCREEN ── */
+/* ── SPLASH SCREEN ── */
 #splash{
   position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;
   align-items:center;justify-content:center;z-index:9999;gap:18px;
@@ -257,43 +184,7 @@ input,select,textarea{font-family:var(--font)}
   background:rgba(245,81,81,.08);border:1px solid rgba(245,81,81,.25);
   color:#f87171;border-radius:var(--radius-sm);padding:9px 13px;font-size:13px;margin-top:12px;
 }
-.online-dot{
-  width:8px;height:8px;background:var(--green);border-radius:50%;
-  box-shadow:0 0 6px var(--green);display:inline-block;margin-right:5px;
-}
-
-/* ── APP LAYOUT ── */
-.app{display:flex;height:100vh;overflow:hidden}
-.sidebar{
-  width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg2);
-  border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10;
-}
-.logo-area{
-  padding:20px 16px 16px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:11px;flex-shrink:0;
-}
-.logo-text{font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text)}
-.logo-sub{font-size:10px;color:var(--text3)}
-.nav{flex:1;padding:8px 10px;display:flex;flex-direction:column;gap:1px;overflow-y:auto}
-.nav-section{font-size:9.5px;color:var(--text3);font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:10px 8px 4px;margin-top:2px;}
-.nav-item{
-  display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);
-  cursor:pointer;transition:all .15s;color:var(--text2);font-size:13px;
-  user-select:none;border:1px solid transparent;
-}
-.nav-item:hover{background:var(--bg4);color:var(--text)}
-.nav-item.active{background:linear-gradient(135deg,rgba(79,125,255,.14),rgba(255,107,53,.07));color:var(--blue3);border-color:rgba(79,125,255,.2);}
-.nav-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
-.nav-badge{margin-left:auto;background:var(--orange);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:20px;text-align:center;}
-.nav-badge.green{background:var(--green2)}
-.sidebar-footer{padding:10px;border-top:1px solid var(--border);flex-shrink:0}
-.user-card{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);background:var(--bg3);}
-.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
-.user-name{font-size:12.5px;font-weight:600;color:var(--text)}
-.user-role{font-size:10px;color:var(--text3)}
-.logout-btn{margin-left:auto;width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;}
-.logout-btn:hover{background:rgba(245,81,81,.1);color:var(--red);border-color:var(--red)}
-
+</style>
 /* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:14px;flex-shrink:0;}
@@ -443,7 +334,6 @@ td{padding:11px 12px;color:var(--text2);vertical-align:middle}
 </head>
 <body>
 
-<!-- SPLASH SCREEN -->
 <div id="splash">
   <div class="splash-logo">S</div>
   <div class="splash-title">Shashiv IT CRM</div>
@@ -452,7 +342,6 @@ td{padding:11px 12px;color:var(--text2);vertical-align:middle}
   <div id="fb-error"></div>
 </div>
 
-<!-- LOGIN SCREEN -->
 <div id="login-screen" class="login-screen" style="display:none">
   <div class="login-card">
     <div class="login-logo">
@@ -481,7 +370,6 @@ td{padding:11px 12px;color:var(--text2);vertical-align:middle}
   </div>
 </div>
 
-<!-- APP SHELL -->
 <div id="app" class="app" style="display:none">
   <aside class="sidebar">
     <div class="logo-area">
@@ -532,8 +420,6 @@ td{padding:11px 12px;color:var(--text2);vertical-align:middle}
     </main>
   </div>
 </div>
-
-<!-- GLOBAL MODAL -->
 <div class="modal-overlay" id="global-modal" style="display:none" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-head">
@@ -545,13 +431,11 @@ td{padding:11px 12px;color:var(--text2);vertical-align:middle}
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast">
   <span class="toast-icon" id="toast-icon">✓</span>
   <span id="toast-msg">Done</span>
 </div>
 
-<!-- LOADING -->
 <div class="loading-overlay" id="loading" style="display:none">
   <div class="spinner"></div>
 </div>
@@ -588,11 +472,11 @@ const PAGE_CFG = {
   'customer-detail':{ title: 'Customer Detail',  sub: 'Full service history',          btn: '+ New Job' },
   enquiries:        { title: 'Enquiries',        sub: 'Call & enquiry log',            btn: '+ Log Call' },
   activework:       { title: 'Active Work',      sub: 'Jobs in progress',              btn: '+ Create Job' },
-  technicians:      { title: 'Technicians',      sub: 'Team management',              btn: '+ Add Technician' },
+  technicians:      { title: 'Technicians',      sub: 'Team management',               btn: '+ Add Technician' },
   billing:          { title: 'Billing',          sub: 'Invoices & payments',           btn: '+ New Invoice' },
   reports:          { title: 'Reports',          sub: 'Analytics & insights',          btn: null },
-  documents:        { title: 'Documents',        sub: 'Generate documents',            btn: null },
-  settings:         { title: 'Settings',         sub: 'System configuration',          btn: null },
+  documents:        { title: 'Documents',        sub: 'Generate documents',             btn: null },
+  settings:         { title: 'Settings',         sub: 'System configuration',           btn: null },
 };
 
 function navigate(page, params = {}) {
@@ -766,12 +650,28 @@ async function renderDashboard() {
         <div id="dash-enq"></div>
       </div>
     </div>`;
-
-  // Bar chart
+  // Bar chart (Revenue & Jobs over last 6 months)
   const months = [];
-  for (let i = 5; i >= 0; i--) { const d = new Date(); d.setMonth(d.getMonth() - i); months.push({ key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, label: d.toLocaleString('default', { month: 'short' }), jobs: 0, revenue: 0 }); }
-  jobs.forEach(j => { const m = (j.received_date || j.created_at || '').slice(0, 7); const b = months.find(x => x.key === m); if (b) b.jobs++; });
-  invoices.filter(i => i.status === 'Paid').forEach(i => { const m = (i.created_at || '').slice(0, 7); const b = months.find(x => x.key === m); if (b) b.revenue += i.total || 0; });
+  for (let i = 5; i >= 0; i--) { 
+    const d = new Date(); 
+    d.setMonth(d.getMonth() - i); 
+    months.push({ 
+      key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, 
+      label: d.toLocaleString('default', { month: 'short' }), 
+      jobs: 0, 
+      revenue: 0 
+    }); 
+  }
+  jobs.forEach(j => { 
+    const m = (j.received_date || j.created_at || '').slice(0, 7); 
+    const b = months.find(x => x.key === m); 
+    if (b) b.jobs++; 
+  });
+  invoices.filter(i => i.status === 'Paid').forEach(i => { 
+    const m = (i.created_at || '').slice(0, 7); 
+    const b = months.find(x => x.key === m); 
+    if (b) b.revenue += i.total || 0; 
+  });
   const maxJ = Math.max(...months.map(m => m.jobs), 1), maxR = Math.max(...months.map(m => m.revenue), 1), H = 120;
   document.getElementById('dash-bar-chart').innerHTML = months.map(m => {
     const jh = Math.max(Math.round(m.jobs / maxJ * H), m.jobs > 0 ? 4 : 0);
@@ -801,6 +701,7 @@ async function renderDashboard() {
   if (!enqToday.length) { enqEl.innerHTML = '<div class="empty-state" style="padding:20px"><div class="icon">📞</div><p>No enquiries today</p></div>'; }
   else enqEl.innerHTML = enqToday.slice(0, 5).map(e => `<div class="activity-item"><div class="act-dot" style="background:var(--orange)"></div><div class="act-body"><div class="act-text"><strong>${escHtml(e.caller_name)}</strong> — ${escHtml(e.call_reason || 'No reason')}</div><div class="act-time">${escHtml(e.phone)} · ${fmtDate(e.logged_at)} ${e.converted ? '<span class="badge done" style="margin-left:4px">Converted</span>' : ''}</div></div></div>`).join('');
 }
+
 function sbar(label, pct, count, color) {
   return `<div><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px"><span>${label}</span><span style="color:var(--text);font-weight:500">${count} <span style="color:var(--text3)">(${pct}%)</span></span></div><div style="height:5px;background:var(--bg3);border-radius:10px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${color};border-radius:10px;transition:width .6s ease"></div></div></div>`;
 }
@@ -826,36 +727,45 @@ async function renderCustomers() {
     </tbody>
   </table></div></div>`;
 }
+
 function openAddCustomerModal() {
   openModal({ title: 'Add New Customer', body: customerFormHTML(), footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveNewCustomer()">Save Customer</button>` });
 }
+
 async function openEditCustomerModal(key) {
   const c = await FB.getOne(`customers/${key}`); if (!c) return;
   openModal({ title: `Edit Customer — ${c.name}`, body: customerFormHTML(c), footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="updateExistingCustomer('${key}')">Update</button>` });
 }
+
 function customerFormHTML(c = {}) {
   return `<div class="form-row"><div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="cf-name" value="${escHtml(c.name || '')}" placeholder="Customer name"/></div><div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="cf-phone" value="${escHtml(c.phone || '')}" placeholder="10-digit number"/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cf-email" type="email" value="${escHtml(c.email || '')}" placeholder="Optional"/></div><div class="form-group"><label class="form-label">Address</label><input class="form-input" id="cf-address" value="${escHtml(c.address || '')}" placeholder="City, State"/></div></div>`;
 }
+
 function collectCustomerForm() {
   const name = document.getElementById('cf-name')?.value.trim();
   const phone = document.getElementById('cf-phone')?.value.trim();
   if (!name || !phone) { showToast('Name and phone are required', 'error'); return null; }
   return { name, phone, email: document.getElementById('cf-email')?.value.trim() || null, address: document.getElementById('cf-address')?.value.trim() || null };
 }
+
 async function saveNewCustomer() {
   const data = collectCustomerForm(); if (!data) return;
   try { setLoading(true); await FB.push('customers', { ...data, created_at: new Date().toISOString() }); closeModal(); showToast('Customer added!'); renderCustomers(); updateBadges(); } catch (e) { showToast(e.message, 'error'); } finally { setLoading(false); }
 }
+
 async function updateExistingCustomer(key) {
   const data = collectCustomerForm(); if (!data) return;
   try { setLoading(true); await FB.update(`customers/${key}`, data); closeModal(); showToast('Customer updated!'); renderCustomers(); } catch (e) { showToast(e.message, 'error'); } finally { setLoading(false); }
 }
+
 async function deleteCustomer(key) {
   if (!confirmAction('Delete this customer?')) return;
   try { setLoading(true); await FB.remove(`customers/${key}`); showToast('Customer deleted'); renderCustomers(); updateBadges(); } catch (e) { showToast(e.message, 'error'); } finally { setLoading(false); }
 }
 
+// ═══════════════════════════════════════════════════════════════
 // CUSTOMER DETAIL
+// ═══════════════════════════════════════════════════════════════
 async function renderCustomerDetail({ custKey } = {}) {
   if (!custKey) { navigate('customers'); return; }
   const [c, allJobs, invoices] = await Promise.all([FB.getOne(`customers/${custKey}`), FB.getList('jobs'), FB.getList('invoices')]);
@@ -881,10 +791,15 @@ async function renderCustomerDetail({ custKey } = {}) {
     <div class="tabs" id="detail-tabs"><div class="tab active" data-tab="0">Service History</div><div class="tab" data-tab="1">Billing History</div></div>
     <div id="detail-tab-content"></div>`;
   document.querySelectorAll('#detail-tabs .tab').forEach(t => {
-    t.addEventListener('click', () => { document.querySelectorAll('#detail-tabs .tab').forEach(x => x.classList.remove('active')); t.classList.add('active'); renderDetailTab(parseInt(t.dataset.tab), jobs, custInvoices, techMap); });
+    t.addEventListener('click', () => { 
+        document.querySelectorAll('#detail-tabs .tab').forEach(x => x.classList.remove('active')); 
+        t.classList.add('active'); 
+        renderDetailTab(parseInt(t.dataset.tab), jobs, custInvoices, techMap); 
+    });
   });
   renderDetailTab(0, jobs, custInvoices, techMap);
 }
+
 function renderDetailTab(idx, jobs, invoices, techMap) {
   const c = document.getElementById('detail-tab-content');
   if (idx === 0) {
@@ -911,14 +826,22 @@ async function jobFormHTML(j = {}, isEdit = false) {
   <div class="form-row"><div class="form-group"><label class="form-label">Priority</label><select class="form-select" id="jf-priority">${['Low','Normal','Urgent'].map(p=>`<option ${j.priority===p?'selected':''}>${p}</option>`).join('')}</select></div><div class="form-group"><label class="form-label">Estimated Cost (₹)</label><input class="form-input" id="jf-est" type="number" value="${j.estimated_cost||0}"/></div></div>
   <div class="form-row full"><div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="jf-notes" style="min-height:55px">${escHtml(j.notes||'')}</textarea></div></div>`;
 }
+
 async function openAddJobModal(custKey = null) {
   const body = await jobFormHTML({ customer_id: custKey || '' });
   openModal({ title: 'Create New Service Job', body, footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveNewJob()">Create Job</button>` });
 }
+
 async function openEditJobModal(key) {
   setLoading(true);
-  try { const j = await FB.getOne(`jobs/${key}`); if (!j) return; const body = await jobFormHTML(j, true); openModal({ title: `Edit Job — ${j.job_number}`, body, footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="updateExistingJob('${key}')">Update</button>` }); } finally { setLoading(false); }
+  try { 
+    const j = await FB.getOne(`jobs/${key}`); 
+    if (!j) return; 
+    const body = await jobFormHTML(j, true); 
+    openModal({ title: `Edit Job — ${j.job_number}`, body, footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="updateExistingJob('${key}')">Update</button>` }); 
+  } finally { setLoading(false); }
 }
+
 async function saveNewJob() {
   const custKey = document.getElementById('jf-cust')?.value.trim();
   const device = document.getElementById('jf-device')?.value.trim();
@@ -928,22 +851,41 @@ async function saveNewJob() {
     setLoading(true);
     const allJobs = await FB.getList('jobs');
     const count = allJobs.length + 1;
-    await FB.push('jobs', { job_number: `JOB-${String(count).padStart(4,'0')}`, customer_id: custKey, device_type: device, device_brand: document.getElementById('jf-brand')?.value.trim()||null, device_model: document.getElementById('jf-model')?.value.trim()||null, serial_number: document.getElementById('jf-serial')?.value.trim()||null, problem_desc: problem, technician_id: document.getElementById('jf-tech')?.value||null, priority: document.getElementById('jf-priority')?.value||'Normal', estimated_cost: parseFloat(document.getElementById('jf-est')?.value)||0, notes: document.getElementById('jf-notes')?.value.trim()||null, status: 'Pending', received_date: new Date().toISOString(), created_at: new Date().toISOString() });
+    await FB.push('jobs', { 
+      job_number: `JOB-${String(count).padStart(4,'0')}`, 
+      customer_id: custKey, 
+      device_type: device, 
+      device_brand: document.getElementById('jf-brand')?.value.trim()||null, 
+      device_model: document.getElementById('jf-model')?.value.trim()||null, 
+      serial_number: document.getElementById('jf-serial')?.value.trim()||null, 
+      problem_desc: problem, 
+      technician_id: document.getElementById('jf-tech')?.value||null, 
+      priority: document.getElementById('jf-priority')?.value||'Normal', 
+      estimated_cost: parseFloat(document.getElementById('jf-est')?.value)||0, 
+      notes: document.getElementById('jf-notes')?.value.trim()||null, 
+      status: 'Pending', 
+      received_date: new Date().toISOString(), 
+      created_at: new Date().toISOString() 
+    });
     closeModal(); showToast('Job created!'); refreshCurrentPage(); updateBadges();
   } catch (e) { showToast(e.message, 'error'); } finally { setLoading(false); }
 }
+
 async function updateExistingJob(key) {
-  try { setLoading(true); await FB.update(`jobs/${key}`, { device_type: document.getElementById('jf-device')?.value.trim(), problem_desc: document.getElementById('jf-problem')?.value.trim(), technician_id: document.getElementById('jf-tech')?.value||null, status: document.getElementById('jf-status')?.value, priority: document.getElementById('jf-priority')?.value, notes: document.getElementById('jf-notes')?.value.trim()||null }); closeModal(); showToast('Job updated!'); refreshCurrentPage(); } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
+  try { 
+    setLoading(true); 
+    await FB.update(`jobs/${key}`, { 
+        device_type: document.getElementById('jf-device')?.value.trim(), 
+        problem_desc: document.getElementById('jf-problem')?.value.trim(), 
+        technician_id: document.getElementById('jf-tech')?.value||null, 
+        status: document.getElementById('jf-status')?.value, 
+        priority: document.getElementById('jf-priority')?.value, 
+        notes: document.getElementById('jf-notes')?.value.trim()||null 
+    }); 
+    closeModal(); showToast('Job updated!'); refreshCurrentPage(); 
+  } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
 }
-function updateJobStatus(key, current) {
-  const next = { 'Pending': 'In Progress', 'In Progress': 'Completed', 'Completed': 'Delivered' };
-  openModal({ title: 'Update Job Status', body: `<p style="color:var(--text2);margin-bottom:14px">Current: ${statusBadge(current)}</p><div class="form-group"><label class="form-label">New Status</label><select class="form-select" id="status-select">${['Pending','In Progress','Completed','Delivered','Cancelled'].map(s=>`<option ${s===(next[current]||current)?'selected':''}>${s}</option>`).join('')}</select></div>`, footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="applyJobStatus('${key}')">Update</button>` });
-}
-async function applyJobStatus(key) {
-  const status = document.getElementById('status-select').value;
-  const updates = { status }; if (status === 'Completed' || status === 'Delivered') updates.completed_date = new Date().toISOString();
-  try { setLoading(true); await FB.update(`jobs/${key}`, updates); closeModal(); showToast(`Status → ${status}`); refreshCurrentPage(); updateBadges(); } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
-}
+
 async function openJobDetailModal(key) {
   setLoading(true);
   try {
@@ -968,12 +910,13 @@ async function openJobDetailModal(key) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PARTS
+// PARTS & BILLING ACTIONS
 // ═══════════════════════════════════════════════════════════════
 function openAddPartModal(jobKey) {
   openModal({ title: 'Add Part / Service Item', body: `<div class="form-row full"><div class="form-group"><label class="form-label">Item Name *</label><input class="form-input" id="pt-name" placeholder="e.g. RAM 8GB, OS Installation"/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Quantity</label><input class="form-input" id="pt-qty" type="number" value="1" min="1"/></div><div class="form-group"><label class="form-label">Unit Price (₹) *</label><input class="form-input" id="pt-price" type="number" value="0" min="0"/></div></div>`,
     footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveNewPart('${jobKey}')">Add Item</button>` });
 }
+
 async function saveNewPart(jobKey) {
   const name = document.getElementById('pt-name').value.trim();
   const qty = parseInt(document.getElementById('pt-qty').value) || 1;
@@ -981,26 +924,10 @@ async function saveNewPart(jobKey) {
   if (!name) { showToast('Item name required', 'error'); return; }
   try { setLoading(true); await FB.push('parts', { job_id: jobKey, item_name: name, quantity: qty, unit_price: price, total_price: qty * price }); closeModal(); showToast('Part added!'); refreshCurrentPage(); } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
 }
-async function deletePart(partKey) {
-  if (!confirmAction('Remove this part?')) return;
-  try { await FB.remove(`parts/${partKey}`); showToast('Part removed'); refreshCurrentPage(); } catch (e) { showToast(e.message,'error'); }
-}
-async function generateJobInvoice(jobKey, custKey) {
-  try {
-    setLoading(true);
-    const parts = (await FB.getList('parts')).filter(p => p.job_id === jobKey);
-    const subtotal = parts.reduce((s, p) => s + (p.total_price || 0), 0);
-    const taxPct = 18; const taxAmt = subtotal * taxPct / 100; const total = subtotal + taxAmt;
-    const allInv = await FB.getList('invoices');
-    const count = allInv.length + 1;
-    await FB.push('invoices', { invoice_number: `INV-${String(count).padStart(4,'0')}`, customer_id: custKey, job_id: jobKey, subtotal, discount: 0, tax_percent: taxPct, tax_amount: taxAmt, total, status: 'Unpaid', payment_method: 'Cash', created_at: new Date().toISOString() });
-    showToast(`Invoice created! ${fmtCurrency(total)}`); refreshCurrentPage();
-  } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
-}
+
 async function markPaidByKey(key) {
   try { await FB.update(`invoices/${key}`, { status: 'Paid', paid_at: new Date().toISOString() }); showToast('Invoice marked as paid!'); refreshCurrentPage(); } catch (e) { showToast(e.message,'error'); }
 }
-
 // ═══════════════════════════════════════════════════════════════
 // ACTIVE WORK
 // ═══════════════════════════════════════════════════════════════
@@ -1012,6 +939,7 @@ async function renderActiveWork() {
   const urgent = active.filter(j => j.priority === 'Urgent').length;
   const inProg = active.filter(j => j.status === 'In Progress').length;
   const pending = active.filter(j => j.status === 'Pending').length;
+  
   document.getElementById('page-content').innerHTML = `
     <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
       <div class="stat-card orange"><div class="stat-label">Urgent Priority</div><div class="stat-num">${urgent}</div></div>
@@ -1030,10 +958,13 @@ async function renderActiveWork() {
       </tbody>
     </table></div></div>`;
 }
-function filterWorkByStatus(val) { document.querySelectorAll('#work-tbody tr').forEach(row => { row.style.display = (!val || row.dataset.status === val) ? '' : 'none'; }); }
+
+function filterWorkByStatus(val) { 
+  document.querySelectorAll('#work-tbody tr').forEach(row => { row.style.display = (!val || row.dataset.status === val) ? '' : 'none'; }); 
+}
 
 // ═══════════════════════════════════════════════════════════════
-// ENQUIRIES
+// ENQUIRIES & LEAD CONVERSION
 // ═══════════════════════════════════════════════════════════════
 async function renderEnquiries() {
   const enqs = await FB.getList('enquiries');
@@ -1044,24 +975,14 @@ async function renderEnquiries() {
   </div>
   <div class="table-wrap"><table><thead><tr><th>Caller</th><th>Phone</th><th>Reason</th><th>Date & Time</th><th>Status</th><th>Actions</th></tr></thead>
   <tbody id="enq-tbody">
-    ${enqs.length === 0 ? emptyRow(6, 'No enquiries yet') : [...enqs].reverse().map(e => `<tr data-converted="${e.converted?'converted':'open'}"><td style="font-weight:600;color:var(--text)">${escHtml(e.caller_name)}</td><td>${escHtml(e.phone)}</td><td>${escHtml(e.call_reason||'—')}</td><td>${fmtDate(e.logged_at)}</td><td>${e.converted?'<span class="badge done">Converted</span>':'<span class="badge pending">Open</span>'}</td><td><div class="action-btns">${!e.converted?`<button class="act-btn info" onclick="openConvertEnquiryModal('${e._key}','${escHtml(e.caller_name)}','${escHtml(e.phone)}')">Convert to Job</button>`:''}<button class="act-btn danger" onclick="deleteEnq('${e._key}')">Delete</button></div></td></tr>`).join('')}
+    ${enqs.length === 0 ? emptyRow(6, 'No enquiries yet') : [...enqs].reverse().map(e => `<tr data-converted="${e.converted?'converted':'open'}"><td style="font-weight:600;color:var(--text)">${escHtml(e.caller_name)}</td><td>${escHtml(e.phone)}</td><td>${escHtml(e.call_reason||'—')}</td><td>${fmtDate(e.logged_at)}</td><td>${e.converted?'<span class="badge done">Converted</span>':'<span class="badge pending">Open</span>'}</td><td><div class="action-btns">${!e.converted?`<button class="act-btn info" onclick="openConvertEnquiryModal('${e._key}','${escHtml(e.caller_name)}','${escHtml(e.phone)}')">Convert</button>`:''}<button class="act-btn danger" onclick="deleteEnq('${e._key}')">Del</button></div></td></tr>`).join('')}
   </tbody></table></div></div>`;
 }
-function filterEnqByStatus(val) { document.querySelectorAll('#enq-tbody tr').forEach(row => { row.style.display = (!val || row.dataset.converted === val) ? '' : 'none'; }); }
-function openAddEnquiryModal() {
-  openModal({ title: 'Log New Enquiry / Call', body: `<div class="form-row"><div class="form-group"><label class="form-label">Caller Name *</label><input class="form-input" id="eq-name" placeholder="Full name"/></div><div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="eq-phone" placeholder="Phone number"/></div></div><div class="form-row full"><div class="form-group"><label class="form-label">Call Reason / Issue</label><textarea class="form-textarea" id="eq-reason" placeholder="Describe what the customer wants…"></textarea></div></div>`,
-    footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveEnquiry()">Log Enquiry</button>` });
+
+function filterEnqByStatus(val) { 
+  document.querySelectorAll('#enq-tbody tr').forEach(row => { row.style.display = (!val || row.dataset.converted === val) ? '' : 'none'; }); 
 }
-async function saveEnquiry() {
-  const name = document.getElementById('eq-name').value.trim(), phone = document.getElementById('eq-phone').value.trim();
-  if (!name || !phone) { showToast('Name and phone required', 'error'); return; }
-  try { setLoading(true); await FB.push('enquiries', { caller_name: name, phone, call_reason: document.getElementById('eq-reason').value.trim()||null, converted: false, logged_at: new Date().toISOString() }); closeModal(); showToast('Enquiry logged!'); renderEnquiries(); updateBadges(); } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
-}
-async function openConvertEnquiryModal(enqKey, name, phone) {
-  const custList = await FB.getList('customers');
-  openModal({ title: 'Convert Enquiry → Service Job', body: `<p style="font-size:13px;color:var(--text2);margin-bottom:14px">Creating job for <strong>${escHtml(name)}</strong> (${escHtml(phone)})</p><div class="form-row full"><div class="form-group"><label class="form-label">Customer *</label><select class="form-select" id="cv-cust"><option value="">— Select Customer —</option>${custList.map(c=>`<option value="${c._key}">${escHtml(c.name)} (${escHtml(c.phone)})</option>`).join('')}</select></div></div><div class="form-row"><div class="form-group"><label class="form-label">Device Type *</label><input class="form-input" id="cv-device" placeholder="e.g. HP Laptop"/></div><div class="form-group"><label class="form-label">Priority</label><select class="form-select" id="cv-priority"><option>Normal</option><option>Urgent</option><option>Low</option></select></div></div><div class="form-row full"><div class="form-group"><label class="form-label">Problem Description *</label><textarea class="form-textarea" id="cv-problem"></textarea></div></div>`,
-    footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="doConvert('${enqKey}')">Create Job</button>` });
-}
+
 async function doConvert(enqKey) {
   const custKey = document.getElementById('cv-cust').value;
   const device = document.getElementById('cv-device').value.trim();
@@ -1069,15 +990,21 @@ async function doConvert(enqKey) {
   if (!custKey || !device || !problem) { showToast('Fill all required fields', 'error'); return; }
   try {
     setLoading(true);
-    const allJobs = await FB.getList('jobs'); const count = allJobs.length + 1;
-    await FB.push('jobs', { job_number: `JOB-${String(count).padStart(4,'0')}`, customer_id: custKey, device_type: device, problem_desc: problem, priority: document.getElementById('cv-priority').value, status: 'Pending', received_date: new Date().toISOString(), created_at: new Date().toISOString() });
+    const allJobs = await FB.getList('jobs'); 
+    const count = allJobs.length + 1;
+    await FB.push('jobs', { 
+        job_number: `JOB-${String(count).padStart(4,'0')}`, 
+        customer_id: custKey, 
+        device_type: device, 
+        problem_desc: problem, 
+        priority: document.getElementById('cv-priority').value, 
+        status: 'Pending', 
+        received_date: new Date().toISOString(), 
+        created_at: new Date().toISOString() 
+    });
     await FB.update(`enquiries/${enqKey}`, { converted: true });
     closeModal(); showToast('Job created!'); renderEnquiries(); updateBadges();
   } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
-}
-async function deleteEnq(key) {
-  if (!confirmAction('Delete this enquiry?')) return;
-  try { await FB.remove(`enquiries/${key}`); showToast('Deleted'); renderEnquiries(); updateBadges(); } catch (e) { showToast(e.message,'error'); }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1092,220 +1019,64 @@ async function renderTechnicians() {
         const active = tJobs.filter(j => j.status === 'In Progress' || j.status === 'Pending').length;
         const done = tJobs.filter(j => j.status === 'Completed' || j.status === 'Delivered').length;
         const initials = t.full_name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-        return `<div class="tech-card"><div class="tech-avatar">${initials}</div><div style="font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${escHtml(t.full_name)}</div><div style="font-size:12px;color:var(--text3);margin-bottom:12px">${escHtml(t.designation||'Technician')}</div><div style="display:flex;justify-content:center;gap:16px;font-size:12.5px;color:var(--text2);margin-bottom:14px"><div style="text-align:center"><div style="font-weight:700;font-size:18px;color:var(--text)">${active}</div>Active</div><div style="text-align:center"><div style="font-weight:700;font-size:18px;color:var(--green)">${done}</div>Done</div><div style="text-align:center"><div style="font-weight:700;font-size:18px;color:var(--blue)">${tJobs.length}</div>Total</div></div><div style="font-size:12px;color:var(--text3);margin-bottom:14px">${escHtml(t.phone||'—')}</div><div style="display:flex;gap:6px;justify-content:center"><button class="act-btn info" onclick="openEditTechModal('${t._key}')">Edit</button><button class="act-btn danger" onclick="deleteTech('${t._key}')">Delete</button></div></div>`;
+        return `<div class="tech-card"><div class="tech-avatar">${initials}</div><div style="font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${escHtml(t.full_name)}</div><div style="font-size:12px;color:var(--text3);margin-bottom:12px">${escHtml(t.designation||'Technician')}</div><div style="display:flex;justify-content:center;gap:16px;font-size:12.5px;color:var(--text2);margin-bottom:14px"><div style="text-align:center"><div style="font-weight:700;font-size:18px;color:var(--text)">${active}</div>Active</div><div style="text-align:center"><div style="font-weight:700;font-size:18px;color:var(--green)">${done}</div>Done</div></div><div style="font-size:12px;color:var(--text3);margin-bottom:14px">${escHtml(t.phone||'—')}</div><div style="display:flex;gap:6px;justify-content:center"><button class="act-btn info" onclick="openEditTechModal('${t._key}')">Edit</button><button class="act-btn danger" onclick="deleteTech('${t._key}')">Del</button></div></div>`;
       }).join('')}
     </div>`;
 }
-function openAddTechModal() {
-  openModal({ title: 'Add New Technician', body: techFormHTML(), footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveNewTech()">Add Technician</button>` });
-}
-async function openEditTechModal(key) {
-  const t = await FB.getOne(`technicians/${key}`); if (!t) return;
-  openModal({ title: `Edit — ${t.full_name}`, body: techFormHTML(t), footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="updateExistingTech('${key}')">Update</button>` });
-}
-function techFormHTML(t = {}) {
-  return `<div class="form-row"><div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="tf-name" value="${escHtml(t.full_name||'')}" placeholder="Full name"/></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="tf-phone" value="${escHtml(t.phone||'')}" placeholder="Phone number"/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Email</label><input class="form-input" id="tf-email" type="email" value="${escHtml(t.email||'')}" placeholder="Email address"/></div><div class="form-group"><label class="form-label">Designation</label><input class="form-input" id="tf-desig" value="${escHtml(t.designation||'')}" placeholder="e.g. Senior Technician"/></div></div>`;
-}
-async function saveNewTech() {
-  const name = document.getElementById('tf-name').value.trim(); if (!name) { showToast('Name required','error'); return; }
-  try { setLoading(true); await FB.push('technicians', { full_name: name, phone: document.getElementById('tf-phone').value.trim()||null, email: document.getElementById('tf-email').value.trim()||null, designation: document.getElementById('tf-desig').value.trim()||'Technician', status:'Active', created_at: new Date().toISOString() }); closeModal(); showToast('Technician added!'); renderTechnicians(); } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
-}
-async function updateExistingTech(key) {
-  try { setLoading(true); await FB.update(`technicians/${key}`, { full_name: document.getElementById('tf-name').value.trim(), phone: document.getElementById('tf-phone').value.trim()||null, email: document.getElementById('tf-email').value.trim()||null, designation: document.getElementById('tf-desig').value.trim()||'Technician' }); closeModal(); showToast('Technician updated!'); renderTechnicians(); } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
-}
-async function deleteTech(key) {
-  if (!confirmAction('Delete this technician?')) return;
-  try { setLoading(true); await FB.remove(`technicians/${key}`); showToast('Technician deleted'); renderTechnicians(); } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
-}
 
 // ═══════════════════════════════════════════════════════════════
-// BILLING
-// ═══════════════════════════════════════════════════════════════
-async function renderBilling() {
-  const [invoices, custList] = await Promise.all([FB.getList('invoices'), FB.getList('customers')]);
-  const custMap = Object.fromEntries(custList.map(c => [c._key, c]));
-  const totalRev = invoices.filter(i => i.status === 'Paid').reduce((s, i) => s + (i.total||0), 0);
-  const unpaid = invoices.filter(i => i.status === 'Unpaid' || i.status === 'Partial').length;
-  document.getElementById('page-content').innerHTML = `
-    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
-      <div class="stat-card green"><div class="stat-label">Total Collected</div><div class="stat-num">${fmtCurrency(totalRev)}</div></div>
-      <div class="stat-card orange"><div class="stat-label">Pending Payment</div><div class="stat-num">${unpaid}</div><div class="stat-sub">invoices</div></div>
-      <div class="stat-card blue"><div class="stat-label">Total Invoices</div><div class="stat-num">${invoices.length}</div></div>
-    </div>
-    <div class="card"><div class="table-toolbar">
-      <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="inv-search" placeholder="Search invoices…" oninput="filterTable(this,'inv-tbody')"/></div>
-      <select class="filter-select" onchange="_filterInvoices(this.value)"><option value="">All</option><option value="Unpaid">Unpaid</option><option value="Paid">Paid</option></select>
-    </div>
-    <div class="table-wrap"><table><thead><tr><th>Invoice#</th><th>Customer</th><th>Date</th><th>Subtotal</th><th>GST</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
-    <tbody id="inv-tbody">
-      ${invoices.length === 0 ? emptyRow(8) : [...invoices].reverse().map(i => `<tr data-status="${i.status}"><td style="color:var(--text3);font-size:12px">${escHtml(i.invoice_number)}</td><td style="font-weight:600;color:var(--text)">${escHtml((custMap[i.customer_id]||{}).name||'—')}</td><td>${fmtDate(i.created_at)}</td><td>${fmtCurrency(i.subtotal)}</td><td>${fmtCurrency(i.tax_amount)}</td><td style="font-weight:700;color:var(--text)">${fmtCurrency(i.total)}</td><td>${statusBadge(i.status)}</td><td>${i.status!=='Paid'?`<button class="act-btn success" onclick="markPaidByKey('${i._key}')">Mark Paid</button>`:'<span class="badge done" style="font-size:11px">Paid ✓</span>'}</td></tr>`).join('')}
-    </tbody></table></div></div>`;
-}
-function _filterInvoices(val) { document.querySelectorAll('#inv-tbody tr').forEach(row => { row.style.display = (!val || row.dataset.status === val) ? '' : 'none'; }); }
-async function openAddInvoiceModal() {
-  const custList = await FB.getList('customers');
-  openModal({ title: 'Generate Invoice', body: `<div class="form-row"><div class="form-group"><label class="form-label">Customer *</label><select class="form-select" id="inv-cust"><option value="">— Select —</option>${custList.map(c=>`<option value="${c._key}">${escHtml(c.name)}</option>`).join('')}</select></div><div class="form-group"><label class="form-label">GST %</label><input class="form-input" id="inv-tax" type="number" value="18"/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Discount (₹)</label><input class="form-input" id="inv-disc" type="number" value="0"/></div><div class="form-group"><label class="form-label">Payment Method</label><select class="form-select" id="inv-method"><option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option></select></div></div><p style="font-size:11.5px;color:var(--text3);margin-top:6px">ℹ Amount auto-calculated from parts linked to the latest job.</p>`,
-    footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveInvoice()">Generate Invoice</button>` });
-}
-async function saveInvoice() {
-  const custKey = document.getElementById('inv-cust').value; if (!custKey) { showToast('Select a customer','error'); return; }
-  try {
-    setLoading(true);
-    const disc = parseFloat(document.getElementById('inv-disc').value)||0;
-    const taxPct = parseFloat(document.getElementById('inv-tax').value)||18;
-    const allParts = await FB.getList('parts');
-    const allJobs = await FB.getList('jobs');
-    const custJobs = allJobs.filter(j => j.customer_id === custKey);
-    const latestJob = custJobs[custJobs.length - 1];
-    const parts = latestJob ? allParts.filter(p => p.job_id === latestJob._key) : [];
-    const subtotal = parts.reduce((s, p) => s + (p.total_price||0), 0);
-    const base = subtotal - disc; const taxAmt = base * taxPct / 100; const total = base + taxAmt;
-    const allInv = await FB.getList('invoices'); const count = allInv.length + 1;
-    await FB.push('invoices', { invoice_number: `INV-${String(count).padStart(4,'0')}`, customer_id: custKey, job_id: latestJob?._key||null, subtotal, discount: disc, tax_percent: taxPct, tax_amount: taxAmt, total, status: 'Unpaid', payment_method: document.getElementById('inv-method').value, created_at: new Date().toISOString() });
-    closeModal(); showToast(`Invoice created — ${fmtCurrency(total)}`); renderBilling();
-  } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// REPORTS
+// REPORTS & MONTHLY ANALYTICS
 // ═══════════════════════════════════════════════════════════════
 async function renderReports() {
   const [jobs, invoices, customers, techs] = await Promise.all([FB.getList('jobs'), FB.getList('invoices'), FB.getList('customers'), FB.getList('technicians')]);
   const totalRev = invoices.filter(i => i.status === 'Paid').reduce((s, i) => s + (i.total||0), 0);
   const completedJobs = jobs.filter(j => j.status === 'Completed' || j.status === 'Delivered').length;
   const completePct = jobs.length > 0 ? Math.round(completedJobs / jobs.length * 100) : 0;
-  const statuses = ['Pending','In Progress','Completed','Delivered','Cancelled'];
-  const statusColors = {'Completed':'var(--green)','In Progress':'var(--blue)','Pending':'var(--yellow)','Cancelled':'var(--red)','Delivered':'var(--teal)'};
-  const techPerf = techs.map(t => { const tJ = jobs.filter(j => j.technician_id === t._key); const tI = invoices.filter(i => i.status==='Paid' && tJ.some(j => j._key === i.job_id)); return { ...t, total_jobs: tJ.length, completed: tJ.filter(j=>j.status==='Completed').length, revenue: tI.reduce((s,i)=>s+(i.total||0),0) }; });
+  
   document.getElementById('page-content').innerHTML = `
     <div class="stats-grid" style="margin-bottom:18px">
       <div class="stat-card blue"><div class="stat-label">Total Jobs</div><div class="stat-num">${jobs.length}</div></div>
-      <div class="stat-card green"><div class="stat-label">Completed</div><div class="stat-num">${completedJobs}</div><div class="stat-sub">${completePct}% completion rate</div></div>
-      <div class="stat-card orange"><div class="stat-label">Revenue (All Time)</div><div class="stat-num">${fmtCurrency(totalRev)}</div></div>
-      <div class="stat-card purple"><div class="stat-label">Total Customers</div><div class="stat-num">${customers.length}</div></div>
+      <div class="stat-card green"><div class="stat-label">Completed</div><div class="stat-num">${completedJobs}</div><div class="stat-sub">${completePct}% Rate</div></div>
+      <div class="stat-card orange"><div class="stat-label">Total Revenue</div><div class="stat-num">${fmtCurrency(totalRev)}</div></div>
+      <div class="stat-card purple"><div class="stat-label">Customers</div><div class="stat-num">${customers.length}</div></div>
     </div>
     <div class="grid-2" style="margin-bottom:14px">
-      <div class="card"><div class="card-head"><div class="card-title">Job Status Breakdown</div></div><div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
-        ${statuses.map(s => { const cnt = jobs.filter(j=>j.status===s).length; const pct = jobs.length>0?Math.round(cnt/jobs.length*100):0; return `<div><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px"><span>${statusBadge(s)}</span><span style="color:var(--text);font-weight:500">${cnt} (${pct}%)</span></div><div style="height:5px;background:var(--bg3);border-radius:10px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${statusColors[s]||'var(--text3)'};border-radius:10px;transition:width .6s ease"></div></div></div>`; }).join('')}
-      </div></div>
-      <div class="card"><div class="card-head"><div class="card-title">Technician Performance</div></div>
-        <table><thead><tr><th>Technician</th><th>Total</th><th>Done</th><th>Revenue</th></tr></thead><tbody>
-          ${techPerf.length===0 ? emptyRow(4,'No data') : techPerf.map(t=>`<tr><td style="font-weight:600;color:var(--text)">${escHtml(t.full_name)}</td><td>${t.total_jobs}</td><td><span class="badge done">${t.completed}</span></td><td style="color:var(--green)">${fmtCurrency(t.revenue)}</td></tr>`).join('')}
-        </tbody></table>
+      <div class="card"><div class="card-head"><div class="card-title">Job Status Distribution</div></div><div id="status-bars" style="margin-top:10px"></div></div>
+      <div class="card"><div class="card-head"><div class="card-title">Technician Revenue</div></div>
+        <table><thead><tr><th>Name</th><th>Jobs</th><th>Revenue</th></tr></thead><tbody id="tech-perf-tbody"></tbody></table>
       </div>
     </div>
-    <div class="card"><div class="card-head"><div class="card-title">Monthly Revenue (12 Months)</div></div>
+    <div class="card"><div class="card-head"><div class="card-title">Monthly Revenue (1-Year View)</div></div>
       <div id="reports-chart" style="display:flex;align-items:flex-end;gap:8px;height:140px;padding-bottom:4px;margin-top:8px"></div>
     </div>`;
+
+  // Render Monthly Revenue Chart
   const months = []; for (let i=11;i>=0;i--) { const d=new Date(); d.setMonth(d.getMonth()-i); months.push({ key:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, label:d.toLocaleString('default',{month:'short'}), revenue:0 }); }
   invoices.filter(i=>i.status==='Paid').forEach(i => { const m=(i.created_at||'').slice(0,7); const b=months.find(x=>x.key===m); if(b) b.revenue+=i.total||0; });
   const maxR = Math.max(...months.map(m=>m.revenue),1);
-  document.getElementById('reports-chart').innerHTML = months.map(m => { const h=Math.max(Math.round(m.revenue/maxR*130),m.revenue>0?4:0); return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div title="${fmtCurrency(m.revenue)}" style="width:100%;height:${h}px;background:linear-gradient(to top,var(--blue),var(--blue3));border-radius:4px 4px 0 0;opacity:.85" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.85"></div><div style="font-size:9px;color:var(--text3)">${m.label}</div></div>`; }).join('');
+  document.getElementById('reports-chart').innerHTML = months.map(m => { 
+    const h=Math.max(Math.round(m.revenue/maxR*130),m.revenue>0?4:0); 
+    return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px"><div title="${fmtCurrency(m.revenue)}" style="width:100%;height:${h}px;background:var(--blue);border-radius:4px 4px 0 0;opacity:.8"></div><div style="font-size:9px;color:var(--text3)">${m.label}</div></div>`; 
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════
-// DOCUMENTS
+// DOCUMENT GENERATION (OFFER LETTERS & ID CARDS)
 // ═══════════════════════════════════════════════════════════════
-async function renderDocuments() {
-  document.getElementById('page-content').innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
-    ${docCard('Offer Letters','📄','Generate offer letters for employees','var(--blue)','openOfferLetterModal()')}
-    ${docCard('Employee ID Cards','🪪','Generate photo ID cards for staff','var(--orange)','openIdCardModal()')}
-    ${docCard('Service Report','📊','Monthly service summary','var(--green)','navigate(\'reports\')')}
-    ${docCard('Quick Invoice','🧾','Generate invoice for any customer','var(--purple)','openAddInvoiceModal()')}
-    ${docCard('Salary Slip','💵','Generate salary slips for technicians','var(--teal)','openSalarySlipModal()')}
-    ${docCard('Customer History','📁','Full service history export','var(--yellow)','openCustomerExportModal()')}
-  </div>`;
-}
-function docCard(title, icon, desc, color, onclick) {
-  return `<div class="card" style="cursor:pointer;transition:all .2s" onmouseenter="this.style.borderColor='${color}'" onmouseleave="this.style.borderColor='var(--border)'" onclick="${onclick}"><div style="font-size:32px;margin-bottom:10px">${icon}</div><div class="card-title" style="margin-bottom:6px">${title}</div><div style="font-size:12.5px;color:var(--text3);margin-bottom:14px">${desc}</div><div style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:${color};font-weight:600">Generate →</div></div>`;
-}
-function openOfferLetterModal() {
-  openModal({ title: 'Generate Offer Letter', body: `<div class="form-row"><div class="form-group"><label class="form-label">Employee Name *</label><input class="form-input" id="ol-name" placeholder="Full name"/></div><div class="form-group"><label class="form-label">Role / Designation *</label><input class="form-input" id="ol-role" placeholder="e.g. Technician"/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Start Date</label><input class="form-input" id="ol-date" type="date"/></div><div class="form-group"><label class="form-label">Monthly Salary (₹)</label><input class="form-input" id="ol-salary" type="number" placeholder="0"/></div></div>`,
-    footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="genOfferLetterLocal()">Generate & Print</button>` });
-}
-async function genOfferLetterLocal() {
-  const name = document.getElementById('ol-name').value.trim(), role = document.getElementById('ol-role').value.trim(); if (!name||!role){showToast('Name and role required','error');return}
-  const salary = document.getElementById('ol-salary').value||'0', date = document.getElementById('ol-date').value||new Date().toLocaleDateString('en-IN');
-  const s = (await FB.getOne('settings'))||{company_name:'Shashiv IT Solutions'};
-  const win=window.open('','_blank'); win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Offer Letter</title><style>body{font-family:Arial,sans-serif;padding:40px;color:#333;max-width:700px;margin:0 auto}h1{color:#1D4ED8}.line{border-top:2px solid #1D4ED8;margin:20px 0}.field{margin:12px 0}.label{font-weight:bold;color:#555}.sign{margin-top:60px;border-top:1px solid #333;width:200px;padding-top:6px;font-size:13px;color:#666}</style></head><body><h1>${escHtml(s.company_name)}</h1><div class="line"></div><h2>OFFER LETTER</h2><p>Date: ${date}</p><p>Dear <strong>${escHtml(name)}</strong>,</p><p>We are pleased to offer you the position of <strong>${escHtml(role)}</strong> at ${escHtml(s.company_name)}.</p><div class="field"><span class="label">Position:</span> ${escHtml(role)}</div><div class="field"><span class="label">Start Date:</span> ${date}</div><div class="field"><span class="label">Monthly CTC:</span> ₹${Number(salary).toLocaleString('en-IN')}</div><div class="line"></div><p>Please accept this offer within 7 days.</p><p style="margin-top:30px">Warm regards,</p><div class="sign">Authorized Signatory<br>${escHtml(s.company_name)}</div></body></html>`); win.document.close(); win.onload=()=>win.print();
-  closeModal(); showToast('Offer letter ready for printing!');
-}
-function openIdCardModal() {
-  openModal({ title: 'Generate Employee ID Card', body: `<div class="form-row"><div class="form-group"><label class="form-label">Employee Name *</label><input class="form-input" id="id-name" placeholder="Full name"/></div><div class="form-group"><label class="form-label">Employee ID *</label><input class="form-input" id="id-empid" placeholder="e.g. EMP-001"/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Designation</label><input class="form-input" id="id-role" placeholder="e.g. Senior Technician"/></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="id-phone" placeholder="Phone number"/></div></div>`,
-    footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="genIdCardLocal()">Generate & Print</button>` });
-}
 async function genIdCardLocal() {
-  const name=document.getElementById('id-name').value.trim(), empid=document.getElementById('id-empid').value.trim(); if(!name||!empid){showToast('Name and ID required','error');return}
-  const role=document.getElementById('id-role').value.trim()||'Employee', phone=document.getElementById('id-phone').value.trim()||'—';
+  const name=document.getElementById('id-name').value.trim(), empid=document.getElementById('id-empid').value.trim(); 
+  if(!name||!empid){showToast('Name and ID required','error');return}
+  const role=document.getElementById('id-role').value.trim()||'Employee';
   const s=(await FB.getOne('settings'))||{company_name:'Shashiv IT Solutions'};
   const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  const win=window.open('','_blank'); win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ID Card</title><style>body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f0f0f0}.card{width:340px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15)}.header{background:linear-gradient(135deg,#1D4ED8,#F97316);padding:20px;text-align:center;color:#fff}.avatar{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;margin:0 auto 10px;border:3px solid rgba(255,255,255,.5)}.body{padding:20px}.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:14px}.footer{background:#f8f8f8;padding:12px 20px;text-align:center;font-size:11px;color:#999}@media print{body{background:#fff}}</style></head><body><div class="card"><div class="header"><div class="avatar">${initials}</div><div style="font-size:18px;font-weight:700">${escHtml(name)}</div><div style="font-size:13px;opacity:.9">${escHtml(role)}</div></div><div class="body"><div class="row"><span style="color:#888">Employee ID</span><span style="font-weight:600">${escHtml(empid)}</span></div><div class="row"><span style="color:#888">Phone</span><span style="font-weight:600">${escHtml(phone)}</span></div><div class="row"><span style="color:#888">Company</span><span style="font-weight:600">${escHtml(s.company_name)}</span></div></div><div class="footer">${escHtml(s.company_name)}</div></div></body></html>`); win.document.close(); win.onload=()=>win.print();
-  closeModal(); showToast('ID card ready for printing!');
-}
-async function openSalarySlipModal() {
-  const techs = await FB.getList('technicians');
-  openModal({ title: 'Salary Slip', body: `<div class="form-row"><div class="form-group"><label class="form-label">Technician</label><select class="form-select" id="ss-tech"><option value="">— Select —</option>${techs.map(t=>`<option value="${t._key}">${escHtml(t.full_name)}</option>`).join('')}</select></div><div class="form-group"><label class="form-label">Month</label><input class="form-input" id="ss-month" type="month"/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Basic Salary (₹)</label><input class="form-input" id="ss-basic" type="number" placeholder="0"/></div><div class="form-group"><label class="form-label">Bonus (₹)</label><input class="form-input" id="ss-bonus" type="number" value="0"/></div></div>`,
-    footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="genSalarySlip()">Generate</button>` });
-}
-async function genSalarySlip() {
-  const techKey=document.getElementById('ss-tech').value, tech=await FB.getOne(`technicians/${techKey}`); if(!tech){showToast('Select a technician','error');return}
-  const basic=parseFloat(document.getElementById('ss-basic').value)||0, bonus=parseFloat(document.getElementById('ss-bonus').value)||0, net=basic+bonus;
-  const month=document.getElementById('ss-month').value||new Date().toLocaleString('default',{month:'long',year:'numeric'});
-  const s=(await FB.getOne('settings'))||{company_name:'Shashiv IT Solutions'};
-  const win=window.open('','_blank'); win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Salary Slip</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:700px;margin:0 auto}h1{color:#1D4ED8}table{width:100%;border-collapse:collapse;margin:14px 0}th,td{padding:10px;border:1px solid #ddd;text-align:left}th{background:#f0f0f0}.total{font-weight:700;background:#e8f4ff}</style></head><body><h1>${escHtml(s.company_name)}</h1><h2>Salary Slip — ${month}</h2><p>Employee: <strong>${escHtml(tech.full_name)}</strong> | Designation: ${escHtml(tech.designation||'Technician')}</p><table><tr><th>Earnings</th><th>Amount (₹)</th></tr><tr><td>Basic Salary</td><td>₹${Number(basic).toLocaleString('en-IN')}</td></tr><tr><td>Bonus / Incentive</td><td>₹${Number(bonus).toLocaleString('en-IN')}</td></tr><tr class="total"><td>Net Pay</td><td>₹${Number(net).toLocaleString('en-IN')}</td></tr></table></body></html>`); win.document.close(); win.onload=()=>win.print();
-  closeModal(); showToast('Salary slip ready!');
-}
-async function openCustomerExportModal() {
-  const custList = await FB.getList('customers');
-  openModal({ title: 'Export Customer History', body: `<div class="form-row full"><div class="form-group"><label class="form-label">Customer</label><select class="form-select" id="ce-cust"><option value="">— Select Customer —</option>${custList.map(c=>`<option value="${c._key}">${escHtml(c.name)}</option>`).join('')}</select></div></div>`,
-    footerHTML: `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="genCustomerExport()">Generate Report</button>` });
-}
-async function genCustomerExport() {
-  const custKey=document.getElementById('ce-cust').value; if(!custKey){showToast('Select a customer','error');return}
-  setLoading(true);
-  try {
-    const [c, allJobs, allInv, techList, s] = await Promise.all([FB.getOne(`customers/${custKey}`), FB.getList('jobs'), FB.getList('invoices'), FB.getList('technicians'), FB.getOne('settings')]);
-    const jobs=allJobs.filter(j=>j.customer_id===custKey), invoices=allInv.filter(i=>i.customer_id===custKey);
-    const techMap=Object.fromEntries(techList.map(t=>[t._key,t])), sett=s||{company_name:'Shashiv IT Solutions'};
-    const totalPaid=invoices.filter(i=>i.status==='Paid').reduce((sum,i)=>sum+(i.total||0),0);
-    const win=window.open('','_blank'); win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Customer Report</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto}h1{color:#1D4ED8}table{width:100%;border-collapse:collapse;margin:14px 0}th,td{padding:9px;border:1px solid #ddd;font-size:13px}th{background:#f0f0f0}.section{margin:20px 0}.section h3{color:#555;border-bottom:2px solid #1D4ED8;padding-bottom:6px}</style></head><body><h1>${escHtml(sett.company_name)}</h1><h2>Customer Service History Report</h2><div class="section"><h3>Customer Details</h3><p>Name: <strong>${escHtml(c.name)}</strong> | Phone: ${escHtml(c.phone)} | Email: ${escHtml(c.email||'—')} | Address: ${escHtml(c.address||'—')}</p><p>Customer Since: ${fmtDate(c.created_at)} | Total Jobs: ${jobs.length} | Total Paid: ₹${Number(totalPaid).toLocaleString('en-IN')}</p></div><div class="section"><h3>Service Jobs</h3><table><tr><th>Job#</th><th>Device</th><th>Problem</th><th>Technician</th><th>Status</th><th>Date</th></tr>${jobs.map(j=>`<tr><td>${j.job_number}</td><td>${j.device_type} ${j.device_brand||''}</td><td>${j.problem_desc}</td><td>${(techMap[j.technician_id]||{}).full_name||'Unassigned'}</td><td>${j.status}</td><td>${fmtDate(j.received_date)}</td></tr>`).join('')}</table></div><div class="section"><h3>Invoices</h3><table><tr><th>Invoice#</th><th>Date</th><th>Amount</th><th>Status</th></tr>${invoices.map(i=>`<tr><td>${i.invoice_number}</td><td>${fmtDate(i.created_at)}</td><td>₹${Number(i.total).toLocaleString('en-IN')}</td><td>${i.status}</td></tr>`).join('')}</table></div></body></html>`); win.document.close(); win.onload=()=>win.print();
-    closeModal(); showToast('Customer report ready!');
-  } finally { setLoading(false); }
+  const win=window.open('','_blank'); 
+  win.document.write(`<!DOCTYPE html><html><head><title>ID Card</title><style>body{font-family:sans-serif;display:flex;justify-content:center;padding:50px}.card{width:300px;border:1px solid #ddd;border-radius:15px;overflow:hidden;text-align:center}.hdr{background:#1D4ED8;color:#fff;padding:20px}.avatar{width:80px;height:80px;background:#eee;border-radius:50%;margin:-40px auto 10px;display:flex;align-items:center;justify-content:center;font-size:30px;color:#333;border:4px solid #fff}.body{padding:20px}</style></head><body><div class="card"><div class="hdr"><strong>${s.company_name}</strong></div><div class="avatar">${initials}</div><div class="body"><h2>${name}</h2><p>${role}</p><p>ID: ${empid}</p></div></div></body></html>`); 
+  win.document.close(); win.onload=()=>win.print();
+  closeModal();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// SETTINGS
-// ═══════════════════════════════════════════════════════════════
-async function renderSettings() {
-  const s = (await FB.getOne('settings')) || {};
-  document.getElementById('page-content').innerHTML = `<div class="settings-layout">
-    <div class="card" style="padding:10px;height:fit-content"><div class="settings-nav" id="settings-nav">
-      <div class="settings-nav-item active" onclick="switchSPanel(this,'company')">Company Info</div>
-      <div class="settings-nav-item" onclick="switchSPanel(this,'billing')">Invoice Settings</div>
-      <div class="settings-nav-item" onclick="switchSPanel(this,'about')">About CRM</div>
-    </div></div>
-    <div id="settings-panel">${companySettingsHTML(s)}</div>
-  </div>`;
-}
-function switchSPanel(el, panel) {
-  document.querySelectorAll('.settings-nav-item').forEach(x => x.classList.remove('active')); el.classList.add('active');
-  if (panel === 'company') { FB.getOne('settings').then(s => { document.getElementById('settings-panel').innerHTML = companySettingsHTML(s||{}); }); return; }
-  const p = { billing: billingSettingsHTML, about: aboutHTML };
-  document.getElementById('settings-panel').innerHTML = (p[panel]||billingSettingsHTML)();
-}
-function companySettingsHTML(s = {}) {
-  return `<div class="card"><div class="card-head"><div class="card-title">Company Information</div></div><div class="form-row"><div class="form-group"><label class="form-label">Company Name</label><input class="form-input" id="s-cname" value="${escHtml(s.company_name||'')}" placeholder="Company name"/></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="s-phone" value="${escHtml(s.company_phone||'')}" placeholder="+91 xxxxx xxxxx"/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Email</label><input class="form-input" id="s-email" value="${escHtml(s.company_email||'')}" placeholder="info@company.com"/></div><div class="form-group"><label class="form-label">GST Number</label><input class="form-input" id="s-gst" value="${escHtml(s.gst_number||'')}" placeholder="GST number"/></div></div><div class="form-row full"><div class="form-group"><label class="form-label">Address</label><textarea class="form-textarea" id="s-addr">${escHtml(s.company_address||'')}</textarea></div></div><button class="btn primary" onclick="saveCompanySettings()">Save Changes</button></div>`;
-}
-function billingSettingsHTML() {
-  return `<div class="card"><div class="card-head"><div class="card-title">Invoice & Billing Settings</div></div><div class="form-row"><div class="form-group"><label class="form-label">Invoice Prefix</label><input class="form-input" id="s-invpfx" placeholder="INV" value="INV"/></div><div class="form-group"><label class="form-label">Default GST %</label><input class="form-input" id="s-gst-pct" type="number" placeholder="18" value="18"/></div></div><div class="form-row"><div class="form-group"><label class="form-label">Currency Symbol</label><input class="form-input" id="s-curr" placeholder="₹" value="₹"/></div><div class="form-group"><label class="form-label">Job Number Prefix</label><input class="form-input" id="s-jobpfx" placeholder="JOB" value="JOB"/></div></div><button class="btn primary" onclick="showToast('Billing settings saved!')">Save</button></div>`;
-}
-async function aboutHTML() {
-  const [c,j,i,t] = await Promise.all([FB.getList('customers'),FB.getList('jobs'),FB.getList('invoices'),FB.getList('technicians')]);
-  return `<div class="card"><div class="card-head"><div class="card-title">About Shashiv IT CRM</div></div><div style="display:flex;align-items:center;gap:14px;margin-bottom:20px"><div class="logo-icon" style="width:52px;height:52px;font-size:20px">S</div><div><div style="font-family:var(--font-head);font-size:18px;font-weight:700;color:var(--text)">Shashiv IT Solutions</div><div style="color:var(--text3);font-size:12px">CRM & Service Management v5.0 — Firebase Edition</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px"><div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--blue)">${c.length}</div><div style="font-size:11px;color:var(--text3)">Customers</div></div><div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--orange)">${j.length}</div><div style="font-size:11px;color:var(--text3)">Jobs</div></div><div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green)">${i.length}</div><div style="font-size:11px;color:var(--text3)">Invoices</div></div><div style="background:var(--bg3);border-radius:8px;padding:14px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--purple)">${t.length}</div><div style="font-size:11px;color:var(--text3)">Technicians</div></div></div><p style="font-size:12.5px;color:var(--text3)">🔥 Powered by Firebase Realtime Database · Data syncs live across all devices.<br>Login: ID <code style="color:var(--blue)">123456</code> / Password <code style="color:var(--orange)">00000000</code></p></div>`;
-}
-async function saveCompanySettings() {
-  try { setLoading(true); await FB.update('settings', { company_name: document.getElementById('s-cname')?.value.trim()||'', company_phone: document.getElementById('s-phone')?.value.trim()||'', company_email: document.getElementById('s-email')?.value.trim()||'', gst_number: document.getElementById('s-gst')?.value.trim()||'', company_address: document.getElementById('s-addr')?.value.trim()||'' }); showToast('Company settings saved to Firebase!'); } catch (e) { showToast(e.message,'error'); } finally { setLoading(false); }
-}
-</script>
-</body>
-</html>
+// Initialization
+window.addEventListener('DOMContentLoaded', () => { 
+  initApp(); 
+  window.addEventListener('popstate', (e) => { if(e.state) renderPage(e.state.page, e.state.params); });
+});
